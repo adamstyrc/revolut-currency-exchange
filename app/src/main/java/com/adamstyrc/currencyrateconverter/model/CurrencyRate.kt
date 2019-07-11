@@ -1,4 +1,4 @@
-package com.adamstyrc.currencyrateconverter
+package com.adamstyrc.currencyrateconverter.model
 
 class CurrencyRate {
     var currency: String? = null

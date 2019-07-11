@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.adamstyrc.currencyrateconverter.CurrencyRate
+import com.adamstyrc.currencyrateconverter.model.CurrencyRate
 import com.adamstyrc.currencyrateconverter.R
 
 class CurrenciesRateAdapter(
