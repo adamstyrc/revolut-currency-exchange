@@ -10,7 +10,7 @@ import com.adamstyrc.currencyrateconverter.CurrencyRate
 import com.adamstyrc.currencyrateconverter.R
 
 class CurrenciesRateAdapter(
-    private val currencyRates: List<CurrencyRate>
+    var currencyRates: List<CurrencyRate>
 ) : RecyclerView.Adapter<CurrencyRateViewHolder>() {
 
     override fun getItemCount() = currencyRates.size
