@@ -6,14 +6,14 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.adamstyrc.currencyrateconverter.model.CurrencyRate
+import com.adamstyrc.currencyrateconverter.model.CalculatedCurrency
 import com.adamstyrc.currencyrateconverter.R
 
 class CurrenciesRateAdapter(
-    var currencyRates: List<CurrencyRate>
+    var calculatedCurrencies: List<CalculatedCurrency>
 ) : RecyclerView.Adapter<CurrencyRateViewHolder>() {
 
-    override fun getItemCount() = currencyRates.size
+    override fun getItemCount() = calculatedCurrencies.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyRateViewHolder {
         val itemView = LayoutInflater.from(parent.context)
@@ -22,7 +22,7 @@ class CurrenciesRateAdapter(
     }
 
     override fun onBindViewHolder(holder: CurrencyRateViewHolder, position: Int) {
-        val currencyRate = currencyRates[position]
+        val currencyRate = calculatedCurrencies[position]
         holder.bindCurrencyRate(currencyRate)
     }
 }
@@ -31,9 +31,9 @@ class CurrencyRateViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
     private var tvCurrencyName: TextView = itemView.findViewById(R.id.tvCurrencyName)
     private var etRateConverter: EditText = itemView.findViewById(R.id.etRate)
 
-    fun bindCurrencyRate(currencyRate: CurrencyRate) {
-        tvCurrencyName.text = currencyRate.currency
-        etRateConverter.setText(currencyRate.rate.toString())
+    fun bindCurrencyRate(calculatedCurrency: CalculatedCurrency) {
+        tvCurrencyName.text = calculatedCurrency.currency.name
+        etRateConverter.setText(calculatedCurrency.value.toString())
     }
 
 }

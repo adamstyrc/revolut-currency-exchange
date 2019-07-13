@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         rvCurrencyRates.adapter = currenciesRateAdapter
 
         viewModel.currencyRateLiveData.observe(this, Observer { currencyRates ->
-            currenciesRateAdapter.currencyRates = currencyRates
+            currenciesRateAdapter.calculatedCurrencies = currencyRates
             currenciesRateAdapter.notifyDataSetChanged()
         })
     }

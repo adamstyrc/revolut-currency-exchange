@@ -2,9 +2,9 @@ package com.adamstyrc.currencyrateconverter.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.adamstyrc.currencyrateconverter.model.CurrencyRate
+import com.adamstyrc.currencyrateconverter.model.CalculatedCurrency
 import com.adamstyrc.currencyrateconverter.api.RevolutApi
-import com.adamstyrc.currencyrateconverter.model.SupportedCurrency
+import com.adamstyrc.currencyrateconverter.model.Currency
 import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
@@ -12,23 +12,23 @@ class CurrencyRateViewModel @Inject constructor(
     val api: RevolutApi
 ) : ViewModel() {
 
-    val currencyRateLiveData = MutableLiveData<ArrayList<CurrencyRate>>()
+    val currencyRateLiveData = MutableLiveData<ArrayList<CalculatedCurrency>>()
         .apply {
-            value = ArrayList<CurrencyRate>()
+            value = ArrayList<CalculatedCurrency>()
                 .apply {
                     add(
-                        CurrencyRate()
-                        .apply { currency = "GBR"; rate = 1.10 })
+                        CalculatedCurrency(Currency.GBP, 1.10)
+                    )
                 }
                 .apply {
                     add(
-                        CurrencyRate()
-                        .apply { currency = "USD"; rate = 0.90 })
+                        CalculatedCurrency(Currency.USD, 0.90)
+                    )
                 }
         }
 
     fun updateCurrencyRates() {
-        api.get(SupportedCurrency.EUR.name)
+        api.get(Currency.EUR.name)
             .subscribeBy(onSuccess = {
                 val value = currencyRateLiveData.value
                 value?.add(value[0])

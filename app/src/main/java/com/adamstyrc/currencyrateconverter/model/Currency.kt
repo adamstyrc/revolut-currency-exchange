@@ -1,6 +1,6 @@
 package com.adamstyrc.currencyrateconverter.model
 
-enum class SupportedCurrency {
+enum class Currency {
     EUR,
     AUD,
     GBP,
