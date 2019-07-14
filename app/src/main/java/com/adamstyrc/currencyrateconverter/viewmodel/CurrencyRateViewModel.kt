@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.adamstyrc.currencyrateconverter.api.RevolutApi
 import com.adamstyrc.currencyrateconverter.api.model.response.CurrencyRateResponse
-import com.adamstyrc.currencyrateconverter.model.EstimatedCurrency
+import com.adamstyrc.currencyrateconverter.model.EstimatedCurrencyExchange
 import com.adamstyrc.currencyrateconverter.model.Currency
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -16,7 +16,11 @@ class CurrencyRateViewModel @Inject constructor(
     private val api: RevolutApi
 ) : ViewModel() {
 
-    val estimatedCurrencies = MutableLiveData<ArrayList<EstimatedCurrency>>()
+    companion object {
+        val AUTO_REFRESH_PERIOD = TimeUnit.SECONDS
+    }
+
+    val estimatedCurrenciesExchange = MutableLiveData<ArrayList<EstimatedCurrencyExchange>>()
         .apply { value = ArrayList() }
     var baseCurrency: Currency
         get() = orderedCurrencies[0]
@@ -38,7 +42,7 @@ class CurrencyRateViewModel @Inject constructor(
     private var disposable: Disposable? = null
 
     fun startUpdatingCurrencyRates() {
-        disposable = Observable.interval(1, TimeUnit.SECONDS)
+        disposable = Observable.interval(1, AUTO_REFRESH_PERIOD)
             .flatMap { api.get(baseCurrency.name).toObservable() }
             .subscribeBy(onNext = { currencyRateData ->
                 latestCurrencyRates = currencyRateData
@@ -64,18 +68,18 @@ class CurrencyRateViewModel @Inject constructor(
 
         val latestExchangedByBaseCurrencies = orderedCurrencies.map { currency ->
             if (currency == orderedCurrencies[0]) {
-                return@map EstimatedCurrency(currency, baseCurrencyAmount)
+                return@map EstimatedCurrencyExchange(currency, baseCurrencyAmount)
             }
             val currencyName = currency.name
             val currencyRate = currencyRates.rates?.get(currencyName)
             if (currencyRate != null) {
-                return@map EstimatedCurrency(currency, currencyRate * baseCurrencyAmount)
+                return@map EstimatedCurrencyExchange(currency, currencyRate * baseCurrencyAmount)
             } else {
                 return
             }
         }
 
-        estimatedCurrencies.postValue(ArrayList(latestExchangedByBaseCurrencies))
+        estimatedCurrenciesExchange.postValue(ArrayList(latestExchangedByBaseCurrencies))
     }
 
     private fun onBaseCurrencyChanged(currency: Currency) {
@@ -83,7 +87,7 @@ class CurrencyRateViewModel @Inject constructor(
         orderedCurrencies.remove(currency)
         orderedCurrencies.add(0, currency)
 
-        baseCurrencyAmount = estimatedCurrencies.value
+        baseCurrencyAmount = estimatedCurrenciesExchange.value
             ?.find { it.currency == currency }
             ?.value!!
 

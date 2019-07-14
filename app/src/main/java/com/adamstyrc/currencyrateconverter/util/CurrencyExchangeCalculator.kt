@@ -1,6 +1,6 @@
 package com.adamstyrc.currencyrateconverter.util
 
-import com.adamstyrc.currencyrateconverter.model.EstimatedCurrency
+import com.adamstyrc.currencyrateconverter.model.EstimatedCurrencyExchange
 import com.adamstyrc.currencyrateconverter.model.Currency
 
 class CurrencyExchangeCalculator {
@@ -9,12 +9,12 @@ class CurrencyExchangeCalculator {
         currencyRatesData: Map<String, Float>,
         wantedCurrency: Currency,
         exchangedValue: Float
-    ) : EstimatedCurrency? {
+    ) : EstimatedCurrencyExchange? {
         val exchangeRate = currencyRatesData[wantedCurrency.name]
 
         if (exchangeRate != null) {
             val calculatedValue = exchangeRate * exchangedValue
-            return EstimatedCurrency(wantedCurrency, calculatedValue)
+            return EstimatedCurrencyExchange(wantedCurrency, calculatedValue)
         } else {
             return null
         }

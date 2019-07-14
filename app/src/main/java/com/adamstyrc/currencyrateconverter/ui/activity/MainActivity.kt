@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.adamstyrc.currencyrateconverter.R
 import com.adamstyrc.currencyrateconverter.dagger.InjectionGraph
-import com.adamstyrc.currencyrateconverter.model.EstimatedCurrency
+import com.adamstyrc.currencyrateconverter.model.EstimatedCurrencyExchange
 import com.adamstyrc.currencyrateconverter.model.Currency
 import com.adamstyrc.currencyrateconverter.ui.adapter.CurrenciesExchangeAdapter
 import com.adamstyrc.currencyrateconverter.viewmodel.CurrencyRateViewModel
@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         rvCurrencyRates.layoutManager = LinearLayoutManager(this)
         rvCurrencyRates.adapter = currenciesRateAdapter
 
-        viewModel.estimatedCurrencies.observe(this, Observer { currencyRates ->
+        viewModel.estimatedCurrenciesExchange.observe(this, Observer { currencyRates ->
             updateExchangedCurrencies(currencyRates)
         })
     }
@@ -56,8 +56,8 @@ class MainActivity : AppCompatActivity() {
         viewModel.baseCurrency = currency
     }
 
-    private fun updateExchangedCurrencies(currencyRates: ArrayList<EstimatedCurrency>) {
-        currenciesRateAdapter.items = currencyRates
+    private fun updateExchangedCurrencies(currencyExchangeRates: ArrayList<EstimatedCurrencyExchange>) {
+        currenciesRateAdapter.items = currencyExchangeRates
         currenciesRateAdapter.notifyItemRangeChanged(1, currenciesRateAdapter.itemCount - 1)
     }
 }
