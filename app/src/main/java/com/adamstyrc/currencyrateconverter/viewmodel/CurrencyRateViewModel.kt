@@ -3,6 +3,7 @@ package com.adamstyrc.currencyrateconverter.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.adamstyrc.currencyrateconverter.api.RevolutApi
+import com.adamstyrc.currencyrateconverter.api.model.response.CurrencyRateResponse
 import com.adamstyrc.currencyrateconverter.model.CalculatedCurrency
 import com.adamstyrc.currencyrateconverter.model.Currency
 import io.reactivex.Observable
@@ -12,49 +13,74 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class CurrencyRateViewModel @Inject constructor(
-    val api: RevolutApi
+    private val api: RevolutApi
 ) : ViewModel() {
 
-    val baseCurrency = MutableLiveData<Currency>()
-        .apply { value = Currency.EUR }
+    val exchangedCurrencies = MutableLiveData<ArrayList<CalculatedCurrency>>()
+        .apply { value = ArrayList() }
+    var baseCurrency: Currency
+        get() = orderedCurrencies[0]
+        set(currency) {
+            orderedCurrencies.remove(currency)
+            orderedCurrencies.add(0, currency)
 
-    val exchangedCurrencies = MutableLiveData<List<CalculatedCurrency>>()
-        .apply {
-            value = ArrayList<CalculatedCurrency>()
-                .apply {
-                    add(
-                        CalculatedCurrency(Currency.GBP, 1.10f)
-                    )
-                }
-                .apply {
-                    add(
-                        CalculatedCurrency(Currency.USD, 0.90f)
-                    )
-                }
+            baseCurrencyAmount = exchangedCurrencies.value
+                ?.find { it.currency == currency }
+                ?.value!!
         }
 
+    private val orderedCurrencies = arrayListOf(
+        Currency.EUR,
+        Currency.USD,
+        Currency.GBP,
+        Currency.AUD,
+        Currency.PLN,
+        Currency.JPY,
+        Currency.CZK
+    )
+    private var baseCurrencyAmount = 100f
+    private var latestCurrencyRates: CurrencyRateResponse? = null
     private var disposable: Disposable? = null
 
     fun startUpdatingCurrencyRates() {
         disposable = Observable.interval(1, TimeUnit.SECONDS)
-            .flatMap { api.get(Currency.EUR.name).toObservable() }
+            .flatMap { api.get(baseCurrency.name).toObservable() }
             .subscribeBy(onNext = { currencyRateData ->
-                val recalculatedExchangedCurrencies = Currency.values().asList()
-                    .map { currency ->
-                        if (currency == baseCurrency.value) {
-                            return@map CalculatedCurrency(currency, 100f)
-                        }
-                        val currencyName = currency.name
-                        val currencyRate = currencyRateData.rates!!.getValue(currencyName)
-                        CalculatedCurrency(currency, currencyRate * 100f)
-                    }
-
-                exchangedCurrencies.postValue(recalculatedExchangedCurrencies)
+                latestCurrencyRates = currencyRateData
+                updateExchangedCurrencies()
             }, onError = {})
     }
 
     fun cancelUpdatingCurrencyRates() {
         disposable?.dispose()
         disposable = null
+    }
+
+    fun setBaseCurrencyAmount(amount: Float) {
+        baseCurrencyAmount = amount
+        updateExchangedCurrencies()
+    }
+
+
+    private fun updateExchangedCurrencies() {
+        val currencyRates = latestCurrencyRates
+        if (currencyRates == null || currencyRates.base != baseCurrency.name) {
+            return
+        }
+
+        val latestExchangedByBaseCurrencies = orderedCurrencies.map { currency ->
+            if (currency == orderedCurrencies[0]) {
+                return@map CalculatedCurrency(currency, baseCurrencyAmount)
+            }
+            val currencyName = currency.name
+            val currencyRate = currencyRates.rates?.get(currencyName)
+            if (currencyRate != null) {
+                CalculatedCurrency(currency, currencyRate * baseCurrencyAmount)
+            } else {
+                return
+            }
+        }
+
+        exchangedCurrencies.postValue(ArrayList(latestExchangedByBaseCurrencies))
     }
 }

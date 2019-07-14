@@ -5,5 +5,8 @@ enum class Currency {
     AUD,
     GBP,
     USD,
-    PLN
+    PLN,
+    JPY,
+    CZK,
+    CHF
 }

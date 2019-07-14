@@ -8,6 +8,8 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.adamstyrc.currencyrateconverter.R
 import com.adamstyrc.currencyrateconverter.dagger.InjectionGraph
+import com.adamstyrc.currencyrateconverter.model.CalculatedCurrency
+import com.adamstyrc.currencyrateconverter.model.Currency
 import com.adamstyrc.currencyrateconverter.ui.adapter.CurrenciesRateAdapter
 import com.adamstyrc.currencyrateconverter.viewmodel.CurrencyRateViewModel
 import kotlinx.android.synthetic.main.activity_main.*
@@ -17,10 +19,8 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-    lateinit var viewModel: CurrencyRateViewModel
-
-    private var currenciesRateAdapter = CurrenciesRateAdapter(emptyList())
-
+    private lateinit var viewModel: CurrencyRateViewModel
+    private var currenciesRateAdapter = CurrenciesRateAdapter(this, ArrayList())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,18 +31,11 @@ class MainActivity : AppCompatActivity() {
             .get(CurrencyRateViewModel::class.java)
 
         rvCurrencyRates.layoutManager = LinearLayoutManager(this)
-        currenciesRateAdapter = CurrenciesRateAdapter(emptyList())
         rvCurrencyRates.adapter = currenciesRateAdapter
 
         viewModel.exchangedCurrencies.observe(this, Observer { currencyRates ->
-            currenciesRateAdapter.calculatedCurrencies = currencyRates
-            currenciesRateAdapter.notifyItemRangeChanged(1, currenciesRateAdapter.itemCount - 1)
+            updateExchangedCurrencies(currencyRates)
         })
-
-//        viewModel.currencyRatesForBaseCurrency.observe(this, Observer { currencyRates ->
-//            currenciesRateAdapter.calculatedCurrenciupdateCurrencyRateses = currencyRates
-//            currenciesRateAdapter.notifyDataSetChanged()
-//        })
     }
 
     override fun onResume() {
@@ -53,5 +46,19 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         viewModel.cancelUpdatingCurrencyRates()
+    }
+
+    fun setBaseCurrencyAmount(amount: Float) {
+        viewModel.setBaseCurrencyAmount(amount)
+    }
+
+    fun setBaseCurrency(currency: Currency) {
+        viewModel.baseCurrency = currency
+
+    }
+
+    private fun updateExchangedCurrencies(currencyRates: ArrayList<CalculatedCurrency>) {
+        currenciesRateAdapter.items = currencyRates
+        currenciesRateAdapter.notifyItemRangeChanged(1, currenciesRateAdapter.itemCount - 1)
     }
 }
