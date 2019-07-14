@@ -6,6 +6,7 @@ import com.adamstyrc.currencyrateconverter.api.RevolutApi
 import com.adamstyrc.currencyrateconverter.api.model.response.CurrencyRateResponse
 import com.adamstyrc.currencyrateconverter.model.EstimatedCurrencyExchange
 import com.adamstyrc.currencyrateconverter.model.Currency
+import com.adamstyrc.currencyrateconverter.util.CurrencyExchangeCalculator
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
@@ -22,11 +23,6 @@ class CurrencyRateViewModel @Inject constructor(
 
     val estimatedCurrenciesExchange = MutableLiveData<ArrayList<EstimatedCurrencyExchange>>()
         .apply { value = ArrayList() }
-    var baseCurrency: Currency
-        get() = orderedCurrencies[0]
-        set(currency) {
-            onBaseCurrencyChanged(currency)
-        }
 
     private val orderedCurrencies = arrayListOf(
         Currency.EUR,
@@ -37,13 +33,14 @@ class CurrencyRateViewModel @Inject constructor(
         Currency.JPY,
         Currency.CZK
     )
+    private var currencyExchangeCalculator = CurrencyExchangeCalculator()
     private var baseCurrencyAmount = 100f
     private var latestCurrencyRates: CurrencyRateResponse? = null
     private var disposable: Disposable? = null
 
     fun startUpdatingCurrencyRates() {
         disposable = Observable.interval(1, AUTO_REFRESH_PERIOD)
-            .flatMap { api.get(baseCurrency.name).toObservable() }
+            .flatMap { api.get(getBaseCurrency().name).toObservable() }
             .subscribeBy(onNext = { currencyRateData ->
                 latestCurrencyRates = currencyRateData
                 updateExchangedCurrencies()
@@ -60,29 +57,7 @@ class CurrencyRateViewModel @Inject constructor(
         updateExchangedCurrencies()
     }
 
-    private fun updateExchangedCurrencies() {
-        val currencyRates = latestCurrencyRates
-        if (currencyRates == null || currencyRates.base != baseCurrency.name) {
-            return
-        }
-
-        val latestExchangedByBaseCurrencies = orderedCurrencies.map { currency ->
-            if (currency == orderedCurrencies[0]) {
-                return@map EstimatedCurrencyExchange(currency, baseCurrencyAmount)
-            }
-            val currencyName = currency.name
-            val currencyRate = currencyRates.rates?.get(currencyName)
-            if (currencyRate != null) {
-                return@map EstimatedCurrencyExchange(currency, currencyRate * baseCurrencyAmount)
-            } else {
-                return
-            }
-        }
-
-        estimatedCurrenciesExchange.postValue(ArrayList(latestExchangedByBaseCurrencies))
-    }
-
-    private fun onBaseCurrencyChanged(currency: Currency) {
+    fun setBaseCurrency(currency: Currency) {
         cancelUpdatingCurrencyRates()
         orderedCurrencies.remove(currency)
         orderedCurrencies.add(0, currency)
@@ -93,4 +68,31 @@ class CurrencyRateViewModel @Inject constructor(
 
         startUpdatingCurrencyRates()
     }
+
+    private fun updateExchangedCurrencies() {
+        val currencyRates = latestCurrencyRates
+        if (currencyRates?.rates == null || currencyRates.base != getBaseCurrency().name) {
+            return
+        }
+
+        val latestExchangedByBaseCurrencies = orderedCurrencies.map { currency ->
+            if (currency == orderedCurrencies[0]) {
+                return@map EstimatedCurrencyExchange(currency, baseCurrencyAmount)
+            }
+
+            currencyExchangeCalculator.calculate(
+                currencyRates.rates!!,
+                currency,
+                baseCurrencyAmount)?.let { estimatedCurrenciesExchange ->
+                return@map estimatedCurrenciesExchange
+            }
+
+            return
+        }
+
+        estimatedCurrenciesExchange.postValue(ArrayList(latestExchangedByBaseCurrencies))
+    }
+
+    private fun getBaseCurrency()  = orderedCurrencies[0]
+
 }

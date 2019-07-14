@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setBaseCurrency(currency: Currency) {
-        viewModel.baseCurrency = currency
+        viewModel.setBaseCurrency(currency)
     }
 
     private fun updateExchangedCurrencies(currencyExchangeRates: ArrayList<EstimatedCurrencyExchange>) {
