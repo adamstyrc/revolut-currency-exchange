@@ -10,7 +10,7 @@ import com.adamstyrc.currencyrateconverter.R
 import com.adamstyrc.currencyrateconverter.dagger.InjectionGraph
 import com.adamstyrc.currencyrateconverter.model.CalculatedCurrency
 import com.adamstyrc.currencyrateconverter.model.Currency
-import com.adamstyrc.currencyrateconverter.ui.adapter.CurrenciesRateAdapter
+import com.adamstyrc.currencyrateconverter.ui.adapter.CurrenciesExchangeAdapter
 import com.adamstyrc.currencyrateconverter.viewmodel.CurrencyRateViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: CurrencyRateViewModel
-    private var currenciesRateAdapter = CurrenciesRateAdapter(this, ArrayList())
+    private var currenciesRateAdapter = CurrenciesExchangeAdapter(this, ArrayList())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +54,6 @@ class MainActivity : AppCompatActivity() {
 
     fun setBaseCurrency(currency: Currency) {
         viewModel.baseCurrency = currency
-
     }
 
     private fun updateExchangedCurrencies(currencyRates: ArrayList<CalculatedCurrency>) {

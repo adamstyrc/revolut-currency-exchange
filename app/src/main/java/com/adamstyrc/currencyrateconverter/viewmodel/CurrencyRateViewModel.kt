@@ -21,15 +21,7 @@ class CurrencyRateViewModel @Inject constructor(
     var baseCurrency: Currency
         get() = orderedCurrencies[0]
         set(currency) {
-            cancelUpdatingCurrencyRates()
-            orderedCurrencies.remove(currency)
-            orderedCurrencies.add(0, currency)
-
-            baseCurrencyAmount = exchangedCurrencies.value
-                ?.find { it.currency == currency }
-                ?.value!!
-
-            startUpdatingCurrencyRates()
+            onBaseCurrencyChanged(currency)
         }
 
     private val orderedCurrencies = arrayListOf(
@@ -64,7 +56,6 @@ class CurrencyRateViewModel @Inject constructor(
         updateExchangedCurrencies()
     }
 
-
     private fun updateExchangedCurrencies() {
         val currencyRates = latestCurrencyRates
         if (currencyRates == null || currencyRates.base != baseCurrency.name) {
@@ -85,5 +76,17 @@ class CurrencyRateViewModel @Inject constructor(
         }
 
         exchangedCurrencies.postValue(ArrayList(latestExchangedByBaseCurrencies))
+    }
+
+    private fun onBaseCurrencyChanged(currency: Currency) {
+        cancelUpdatingCurrencyRates()
+        orderedCurrencies.remove(currency)
+        orderedCurrencies.add(0, currency)
+
+        baseCurrencyAmount = exchangedCurrencies.value
+            ?.find { it.currency == currency }
+            ?.value!!
+
+        startUpdatingCurrencyRates()
     }
 }

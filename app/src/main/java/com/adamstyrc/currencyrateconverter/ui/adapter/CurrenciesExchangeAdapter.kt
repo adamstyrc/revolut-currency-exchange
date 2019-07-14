@@ -13,10 +13,10 @@ import com.adamstyrc.currencyrateconverter.model.CalculatedCurrency
 import com.adamstyrc.currencyrateconverter.R
 import com.adamstyrc.currencyrateconverter.ui.activity.MainActivity
 
-class CurrenciesRateAdapter(
+class CurrenciesExchangeAdapter(
     val context: Context,
     var items: ArrayList<CalculatedCurrency>
-) : RecyclerView.Adapter<CurrenciesRateAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<CurrenciesExchangeAdapter.ViewHolder>() {
 
     override fun getItemCount() = items.size
 
