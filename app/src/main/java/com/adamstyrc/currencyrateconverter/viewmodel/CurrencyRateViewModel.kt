@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.adamstyrc.currencyrateconverter.api.RevolutApi
 import com.adamstyrc.currencyrateconverter.api.model.response.CurrencyRateResponse
-import com.adamstyrc.currencyrateconverter.model.CalculatedCurrency
+import com.adamstyrc.currencyrateconverter.model.EstimatedCurrency
 import com.adamstyrc.currencyrateconverter.model.Currency
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -16,7 +16,7 @@ class CurrencyRateViewModel @Inject constructor(
     private val api: RevolutApi
 ) : ViewModel() {
 
-    val exchangedCurrencies = MutableLiveData<ArrayList<CalculatedCurrency>>()
+    val estimatedCurrencies = MutableLiveData<ArrayList<EstimatedCurrency>>()
         .apply { value = ArrayList() }
     var baseCurrency: Currency
         get() = orderedCurrencies[0]
@@ -64,18 +64,18 @@ class CurrencyRateViewModel @Inject constructor(
 
         val latestExchangedByBaseCurrencies = orderedCurrencies.map { currency ->
             if (currency == orderedCurrencies[0]) {
-                return@map CalculatedCurrency(currency, baseCurrencyAmount)
+                return@map EstimatedCurrency(currency, baseCurrencyAmount)
             }
             val currencyName = currency.name
             val currencyRate = currencyRates.rates?.get(currencyName)
             if (currencyRate != null) {
-                return@map CalculatedCurrency(currency, currencyRate * baseCurrencyAmount)
+                return@map EstimatedCurrency(currency, currencyRate * baseCurrencyAmount)
             } else {
                 return
             }
         }
 
-        exchangedCurrencies.postValue(ArrayList(latestExchangedByBaseCurrencies))
+        estimatedCurrencies.postValue(ArrayList(latestExchangedByBaseCurrencies))
     }
 
     private fun onBaseCurrencyChanged(currency: Currency) {
@@ -83,7 +83,7 @@ class CurrencyRateViewModel @Inject constructor(
         orderedCurrencies.remove(currency)
         orderedCurrencies.add(0, currency)
 
-        baseCurrencyAmount = exchangedCurrencies.value
+        baseCurrencyAmount = estimatedCurrencies.value
             ?.find { it.currency == currency }
             ?.value!!
 

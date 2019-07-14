@@ -9,13 +9,13 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.adamstyrc.currencyrateconverter.model.CalculatedCurrency
+import com.adamstyrc.currencyrateconverter.model.EstimatedCurrency
 import com.adamstyrc.currencyrateconverter.R
 import com.adamstyrc.currencyrateconverter.ui.activity.MainActivity
 
 class CurrenciesExchangeAdapter(
     val context: Context,
-    var items: ArrayList<CalculatedCurrency>
+    var items: ArrayList<EstimatedCurrency>
 ) : RecyclerView.Adapter<CurrenciesExchangeAdapter.ViewHolder>() {
 
     override fun getItemCount() = items.size
@@ -49,19 +49,19 @@ class CurrenciesExchangeAdapter(
         var tvCurrencyName: TextView = itemView.findViewById(R.id.tvCurrencyName)
         var etRateConverter: EditText = itemView.findViewById(R.id.etRate)
 
-        fun bindCurrencyRate(calculatedCurrency: CalculatedCurrency, selectedAsBase: Boolean) {
+        fun bindCurrencyRate(estimatedCurrency: EstimatedCurrency, selectedAsBase: Boolean) {
             etRateConverter.removeTextChangedListener(textChangedListener)
 
-            tvCurrencyName.text = calculatedCurrency.currency.name
+            tvCurrencyName.text = estimatedCurrency.currency.name
             //TODO decide about rounding to 2 last digits
-            val formattedValue = "%.2f".format(calculatedCurrency.value).replace(",", ".")
+            val formattedValue = "%.2f".format(estimatedCurrency.value).replace(",", ".")
             etRateConverter.setText(formattedValue)
 
-            setViewActions(calculatedCurrency, selectedAsBase)
+            setViewActions(estimatedCurrency, selectedAsBase)
         }
 
         private fun setViewActions(
-            calculatedCurrency: CalculatedCurrency,
+            estimatedCurrency: EstimatedCurrency,
             selectedAsBase: Boolean
         ) {
             if (selectedAsBase) {
@@ -72,8 +72,8 @@ class CurrenciesExchangeAdapter(
                     if (hasFocus) {
                         if (context is MainActivity) {
                             moveToTop()
-                            setViewActions(calculatedCurrency, true)
-                            context.setBaseCurrency(calculatedCurrency.currency)
+                            setViewActions(estimatedCurrency, true)
+                            context.setBaseCurrency(estimatedCurrency.currency)
                         }
                     }
                 }
