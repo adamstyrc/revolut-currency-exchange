@@ -33,7 +33,8 @@ class CurrencyRateViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     fun bindCurrencyRate(calculatedCurrency: CalculatedCurrency) {
         tvCurrencyName.text = calculatedCurrency.currency.name
-        etRateConverter.setText(calculatedCurrency.value.toString())
+        val formattedValue = "%.2f".format(calculatedCurrency.value)
+        etRateConverter.setText(formattedValue)
     }
 
 }

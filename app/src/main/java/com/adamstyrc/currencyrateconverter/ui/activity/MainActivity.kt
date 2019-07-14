@@ -34,15 +34,24 @@ class MainActivity : AppCompatActivity() {
         currenciesRateAdapter = CurrenciesRateAdapter(emptyList())
         rvCurrencyRates.adapter = currenciesRateAdapter
 
-        viewModel.currencyRateLiveData.observe(this, Observer { currencyRates ->
+        viewModel.exchangedCurrencies.observe(this, Observer { currencyRates ->
             currenciesRateAdapter.calculatedCurrencies = currencyRates
-            currenciesRateAdapter.notifyDataSetChanged()
+            currenciesRateAdapter.notifyItemRangeChanged(1, currenciesRateAdapter.itemCount - 1)
         })
+
+//        viewModel.currencyRatesForBaseCurrency.observe(this, Observer { currencyRates ->
+//            currenciesRateAdapter.calculatedCurrenciupdateCurrencyRateses = currencyRates
+//            currenciesRateAdapter.notifyDataSetChanged()
+//        })
     }
 
     override fun onResume() {
         super.onResume()
+        viewModel.startUpdatingCurrencyRates()
+    }
 
-        viewModel.updateCurrencyRates()
+    override fun onPause() {
+        super.onPause()
+        viewModel.cancelUpdatingCurrencyRates()
     }
 }

@@ -6,9 +6,9 @@ import com.adamstyrc.currencyrateconverter.model.Currency
 class CurrencyExchangeCalculator {
 
     fun calculate(
-        currencyRatesData: Map<String, Double>,
+        currencyRatesData: Map<String, Float>,
         wantedCurrency: Currency,
-        exchangedValue: Double
+        exchangedValue: Float
     ) : CalculatedCurrency? {
         val exchangeRate = currencyRatesData[wantedCurrency.name]
 

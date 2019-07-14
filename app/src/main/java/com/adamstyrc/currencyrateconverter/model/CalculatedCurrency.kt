@@ -2,5 +2,5 @@ package com.adamstyrc.currencyrateconverter.model
 
 class CalculatedCurrency(
     var currency: Currency,
-    var value: Double = 0.0
+    var value: Float = 0.0f
 )
