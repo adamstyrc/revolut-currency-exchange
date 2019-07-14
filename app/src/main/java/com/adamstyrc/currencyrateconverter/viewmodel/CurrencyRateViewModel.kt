@@ -21,12 +21,15 @@ class CurrencyRateViewModel @Inject constructor(
     var baseCurrency: Currency
         get() = orderedCurrencies[0]
         set(currency) {
+            cancelUpdatingCurrencyRates()
             orderedCurrencies.remove(currency)
             orderedCurrencies.add(0, currency)
 
             baseCurrencyAmount = exchangedCurrencies.value
                 ?.find { it.currency == currency }
                 ?.value!!
+
+            startUpdatingCurrencyRates()
         }
 
     private val orderedCurrencies = arrayListOf(
@@ -75,7 +78,7 @@ class CurrencyRateViewModel @Inject constructor(
             val currencyName = currency.name
             val currencyRate = currencyRates.rates?.get(currencyName)
             if (currencyRate != null) {
-                CalculatedCurrency(currency, currencyRate * baseCurrencyAmount)
+                return@map CalculatedCurrency(currency, currencyRate * baseCurrencyAmount)
             } else {
                 return
             }
