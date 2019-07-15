@@ -38,7 +38,7 @@ class CurrencyRateViewModelTest {
 
     @Test
     fun `base currency is set to EUR`() {
-        viewModel.getEstimatedCurrenciesExchange().observeForever { estimatedCurrenciesExchange ->
+        viewModel.estimatedCurrenciesExchange.observeForever { estimatedCurrenciesExchange ->
             assertEquals(3, estimatedCurrenciesExchange?.size)
             assertEquals(Currency.EUR, estimatedCurrenciesExchange?.get(0)?.currency)
         }
@@ -50,7 +50,7 @@ class CurrencyRateViewModelTest {
         viewModel.latestCurrencyRates = currencyRateResponseForUSD
         viewModel.updateExchangedCurrencies()
 
-        viewModel.getEstimatedCurrenciesExchange().observeForever { estimatedCurrenciesExchange ->
+        viewModel.estimatedCurrenciesExchange.observeForever { estimatedCurrenciesExchange ->
             assertEquals(3, estimatedCurrenciesExchange?.size)
             assertEquals(Currency.USD, estimatedCurrenciesExchange?.get(0)?.currency)
             assertEquals(Currency.EUR, estimatedCurrenciesExchange?.get(1)?.currency)
