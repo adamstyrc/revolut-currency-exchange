@@ -15,7 +15,7 @@ class CurrencyExchangeCalculatorTest {
         val exchangedCurrencyValue = currencyExchangeCalculator.calculate(
             emptyMap(),
             Currency.EUR,
-            100.0
+            100f
         )
 
         assertNull(exchangedCurrencyValue)
@@ -26,10 +26,10 @@ class CurrencyExchangeCalculatorTest {
         val exchangedCurrencyValue = currencyExchangeCalculator.calculate(
             currencyRateDataForUSD,
             Currency.PLN,
-            1.0
+            1f
         )
 
-        assertEquals(3.7222, exchangedCurrencyValue?.value)
+        assertEquals(3.7222f, exchangedCurrencyValue?.value)
     }
 
     @Test
@@ -37,10 +37,10 @@ class CurrencyExchangeCalculatorTest {
         val exchangedCurrencyValue = currencyExchangeCalculator.calculate(
             currencyRateDataForUSD,
             Currency.GBP,
-            100.0
+            100f
         )
 
-        assertEquals(77.424, exchangedCurrencyValue?.value)
+        assertEquals(77.424f, exchangedCurrencyValue?.value)
     }
 
     @Test
@@ -48,10 +48,10 @@ class CurrencyExchangeCalculatorTest {
         val exchangedCurrencyValue = currencyExchangeCalculator.calculate(
             currencyRateDataForEUR,
             Currency.AUD,
-            500.0
+            500f
         )
 
-        assertEquals(696.65, exchangedCurrencyValue?.value)
+        assertEquals(696.65f, exchangedCurrencyValue?.value)
     }
 
     @Test
@@ -59,10 +59,10 @@ class CurrencyExchangeCalculatorTest {
         val exchangedCurrencyValue = currencyExchangeCalculator.calculate(
             currencyRateDataForEUR,
             Currency.AUD,
-            1000.24
+            1000.24f
         )
 
-        assertEquals(1393.634392, exchangedCurrencyValue?.value)
+        assertEquals(1393.634392f, exchangedCurrencyValue?.value)
     }
 
     @Test
@@ -70,20 +70,20 @@ class CurrencyExchangeCalculatorTest {
         val exchangedCurrencyValue = currencyExchangeCalculator.calculate(
             currencyRateDataForEUR,
             Currency.AUD,
-            0.0
+            0.0f
         )
 
-        assertEquals(0.0, exchangedCurrencyValue?.value)
+        assertEquals(0.0f, exchangedCurrencyValue?.value)
     }
 
     // Data and mocks for tests
-    private val currencyRateDataForUSD = HashMap<String, Double>()
-        .apply { put("EUR", 0.86195) }
-        .apply { put("GBP", 0.77424) }
-        .apply { put("PLN", 3.7222) }
+    private val currencyRateDataForUSD = HashMap<String, Float>()
+        .apply { put("EUR", 0.86195f) }
+        .apply { put("GBP", 0.77424f) }
+        .apply { put("PLN", 3.7222f) }
 
 
-    private val currencyRateDataForEUR = HashMap<String, Double>()
-        .apply { put("PLN", 3.7222) }
-        .apply { put("AUD", 1.3933) }
+    private val currencyRateDataForEUR = HashMap<String, Float>()
+        .apply { put("PLN", 3.7222f) }
+        .apply { put("AUD", 1.3933f) }
 }
