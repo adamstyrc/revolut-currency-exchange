@@ -39,6 +39,7 @@ class CurrencyRateViewModel @Inject constructor(
     private var disposable: Disposable? = null
 
     fun startUpdatingCurrencyRates() {
+        // TODO consider rewriting so the first request is fired instantly and others every second
         disposable = Observable.interval(1, AUTO_REFRESH_PERIOD)
             .flatMap { api.get(getBaseCurrency().name).toObservable() }
             .subscribeBy(onNext = { currencyRateData ->
