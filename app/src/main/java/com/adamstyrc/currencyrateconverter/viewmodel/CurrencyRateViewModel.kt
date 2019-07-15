@@ -4,8 +4,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.adamstyrc.currencyrateconverter.api.RevolutApi
 import com.adamstyrc.currencyrateconverter.api.model.response.CurrencyRateResponse
-import com.adamstyrc.currencyrateconverter.model.EstimatedCurrencyExchange
 import com.adamstyrc.currencyrateconverter.model.Currency
+import com.adamstyrc.currencyrateconverter.model.EstimatedCurrencyExchange
 import com.adamstyrc.currencyrateconverter.util.CurrencyExchangeCalculator
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -23,25 +23,16 @@ class CurrencyRateViewModel @Inject constructor(
 
     val estimatedCurrenciesExchange = MutableLiveData<ArrayList<EstimatedCurrencyExchange>>()
         .apply { value = ArrayList() }
-
-    private val orderedCurrencies = arrayListOf(
-        Currency.EUR,
-        Currency.USD,
-        Currency.GBP,
-        Currency.AUD,
-        Currency.PLN,
-        Currency.JPY,
-        Currency.CZK
-    )
-    private var currencyExchangeCalculator = CurrencyExchangeCalculator()
+    var orderedCurrencies = arrayListOf<Currency>()
+    internal var latestCurrencyRates: CurrencyRateResponse? = null
     private var baseCurrencyAmount = 100f
-    private var latestCurrencyRates: CurrencyRateResponse? = null
+    private var currencyExchangeCalculator = CurrencyExchangeCalculator()
     private var disposable: Disposable? = null
 
     fun startUpdatingCurrencyRates() {
         // TODO consider rewriting so the first request is fired instantly and others every second
         disposable = Observable.interval(1, AUTO_REFRESH_PERIOD)
-            .flatMap { api.get(getBaseCurrency().name).toObservable() }
+            .flatMap { api.get(getBaseCurrency().name) }
             .subscribeBy(onNext = { currencyRateData ->
                 latestCurrencyRates = currencyRateData
                 updateExchangedCurrencies()
@@ -70,7 +61,7 @@ class CurrencyRateViewModel @Inject constructor(
         startUpdatingCurrencyRates()
     }
 
-    private fun updateExchangedCurrencies() {
+    internal fun updateExchangedCurrencies() {
         val currencyRates = latestCurrencyRates
         if (currencyRates?.rates == null || currencyRates.base != getBaseCurrency().name) {
             return

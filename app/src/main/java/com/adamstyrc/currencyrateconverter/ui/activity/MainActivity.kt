@@ -29,6 +29,15 @@ class MainActivity : AppCompatActivity() {
         InjectionGraph.Manager.init(this).inject(this)
         viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(CurrencyRateViewModel::class.java)
+        viewModel.orderedCurrencies = arrayListOf(
+            Currency.EUR,
+            Currency.USD,
+            Currency.GBP,
+            Currency.AUD,
+            Currency.PLN,
+            Currency.JPY,
+            Currency.CZK
+        )
 
         rvCurrencyRates.layoutManager = LinearLayoutManager(this)
         rvCurrencyRates.adapter = currenciesRateAdapter
