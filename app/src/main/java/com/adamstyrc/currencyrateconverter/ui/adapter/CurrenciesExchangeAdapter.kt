@@ -54,7 +54,8 @@ class CurrenciesExchangeAdapter(
 
             tvCurrencyName.text = estimatedCurrencyExchange.currency.name
             //TODO decide about rounding to 2 last digits
-            val formattedValue = "%.2f".format(estimatedCurrencyExchange.value).replace(",", ".")
+            val formattedValue = "%.2f".format(estimatedCurrencyExchange.value)
+                .replace(",", ".")
             etRateConverter.setText(formattedValue)
 
             setViewActions(estimatedCurrencyExchange, selectedAsBase)
@@ -70,14 +71,21 @@ class CurrenciesExchangeAdapter(
             } else {
                 etRateConverter.setOnFocusChangeListener { _, hasFocus ->
                     if (hasFocus) {
-                        etRateConverter.removeTextChangedListener(textChangedListener)
-                        if (context is MainActivity) {
-                            moveToTop()
-                            setViewActions(estimatedCurrencyExchange, true)
-                            context.setBaseCurrency(estimatedCurrencyExchange.currency)
-                        }
+                        onFocusIntercepted(estimatedCurrencyExchange, context)
                     }
                 }
+            }
+        }
+
+        private fun onFocusIntercepted(
+            estimatedCurrencyExchange: EstimatedCurrencyExchange,
+            context: Context
+        ) {
+            etRateConverter.removeTextChangedListener(textChangedListener)
+            if (context is MainActivity) {
+                moveToTop()
+                setViewActions(estimatedCurrencyExchange, true)
+                context.setBaseCurrency(estimatedCurrencyExchange.currency)
             }
         }
 
