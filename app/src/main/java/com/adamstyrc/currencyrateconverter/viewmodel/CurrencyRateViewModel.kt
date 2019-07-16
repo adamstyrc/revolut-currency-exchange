@@ -18,7 +18,7 @@ class CurrencyRateViewModel @Inject constructor(
 ) : ViewModel() {
 
     companion object {
-        val AUTO_REFRESH_PERIOD = TimeUnit.SECONDS
+        const val AUTO_REFRESH_PERIOD_IN_SECONDS = 1L
     }
 
     val estimatedCurrenciesExchange = MutableLiveData<ArrayList<EstimatedCurrencyExchange>>()
@@ -31,7 +31,7 @@ class CurrencyRateViewModel @Inject constructor(
 
     fun startUpdatingCurrencyRates() {
         // TODO consider rewriting so the first request is fired instantly and others every second
-        disposable = Observable.interval(1, AUTO_REFRESH_PERIOD)
+        disposable = Observable.interval(AUTO_REFRESH_PERIOD_IN_SECONDS, TimeUnit.SECONDS)
             .flatMap { api.get(getBaseCurrency().name) }
             .subscribeBy(onNext = { currencyRateData ->
                 latestCurrencyRates = currencyRateData
