@@ -12,8 +12,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import io.reactivex.Observable
 import org.junit.Rule
 
-// TODO testing of viewmodel
-// mock API with Dagger
 class CurrencyRateViewModelTest {
 
     // This rule is forced by LiveData trying to call MainThread
