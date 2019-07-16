@@ -40,7 +40,15 @@ class CurrencyRateViewModelTest {
     fun `base currency is set to EUR`() {
         viewModel.estimatedCurrenciesExchange.observeForever { estimatedCurrenciesExchange ->
             assertEquals(3, estimatedCurrenciesExchange?.size)
+
             assertEquals(Currency.EUR, estimatedCurrenciesExchange?.get(0)?.currency)
+            assertEquals(100f, estimatedCurrenciesExchange?.get(0)?.value)
+
+            assertEquals(Currency.USD, estimatedCurrenciesExchange?.get(1)?.currency)
+            assertEquals(116.52f, estimatedCurrenciesExchange?.get(1)?.value)
+
+            assertEquals(Currency.PLN, estimatedCurrenciesExchange?.get(2)?.currency)
+            assertEquals(432.48f, estimatedCurrenciesExchange?.get(2)?.value)
         }
     }
 
@@ -103,6 +111,25 @@ class CurrencyRateViewModelTest {
 
             assertEquals(Currency.PLN, estimatedCurrenciesExchange?.get(2)?.currency)
             assertEquals(0f, estimatedCurrenciesExchange?.get(2)?.value)
+        }
+    }
+
+    @Test
+    fun `set amount to 999,99`() {
+        viewModel.setBaseCurrencyAmount(999.99f)
+        viewModel.updateExchangedCurrencies()
+
+        viewModel.estimatedCurrenciesExchange.observeForever { estimatedCurrenciesExchange ->
+            assertEquals(3, estimatedCurrenciesExchange?.size)
+
+            assertEquals(Currency.EUR, estimatedCurrenciesExchange?.get(0)?.currency)
+            assertEquals(999.99f, estimatedCurrenciesExchange?.get(0)?.value)
+
+            assertEquals(Currency.USD, estimatedCurrenciesExchange?.get(1)?.currency)
+            assertEquals(1165.188348f, estimatedCurrenciesExchange?.get(1)?.value)
+
+            assertEquals(Currency.PLN, estimatedCurrenciesExchange?.get(2)?.currency)
+            assertEquals(4324.756752f, estimatedCurrenciesExchange?.get(2)?.value)
         }
     }
 
