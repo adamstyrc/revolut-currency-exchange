@@ -64,6 +64,7 @@ class CurrencyRateViewModel @Inject constructor(
     internal fun updateExchangedCurrencies() {
         val currencyRates = latestCurrencyRates
         if (currencyRates?.rates == null || currencyRates.base != getBaseCurrency().name) {
+            orderEstimatedCurrenciesExchange()
             return
         }
 
@@ -83,6 +84,16 @@ class CurrencyRateViewModel @Inject constructor(
         }
 
         estimatedCurrenciesExchange.postValue(ArrayList(latestExchangedByBaseCurrencies))
+    }
+
+    private fun orderEstimatedCurrenciesExchange() {
+        val estimatedCurrenciesExchangeList = estimatedCurrenciesExchange.value
+        if (estimatedCurrenciesExchangeList != null && estimatedCurrenciesExchangeList.isNotEmpty()) {
+            val orderedEstimatedCurrenciesExchangeList = orderedCurrencies.map { currency ->
+                estimatedCurrenciesExchangeList.find { it.currency == currency }!!
+            }
+            estimatedCurrenciesExchange.postValue(ArrayList(orderedEstimatedCurrenciesExchangeList))
+        }
     }
 
     private fun getBaseCurrency()  = orderedCurrencies[0]

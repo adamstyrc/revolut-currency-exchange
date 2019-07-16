@@ -3,7 +3,6 @@ package com.adamstyrc.currencyrateconverter.viewmodel
 import com.adamstyrc.currencyrateconverter.api.RevolutApi
 import com.adamstyrc.currencyrateconverter.api.model.response.CurrencyRateResponse
 import com.adamstyrc.currencyrateconverter.model.Currency
-import io.reactivex.Single
 import junit.framework.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -17,6 +16,7 @@ import org.junit.Rule
 // mock API with Dagger
 class CurrencyRateViewModelTest {
 
+    // This rule is forced by LiveData trying to call MainThread
     @Rule @JvmField
     val rule : InstantTaskExecutorRule = InstantTaskExecutorRule()
 
@@ -46,24 +46,47 @@ class CurrencyRateViewModelTest {
 
     @Test
     fun `change base currency from EUR to USD with new currency rates`() {
+        val expectedNewBaseAmount = 100f * 1.1652f
+
         viewModel.setBaseCurrency(Currency.USD)
         viewModel.latestCurrencyRates = currencyRateResponseForUSD
         viewModel.updateExchangedCurrencies()
 
         viewModel.estimatedCurrenciesExchange.observeForever { estimatedCurrenciesExchange ->
             assertEquals(3, estimatedCurrenciesExchange?.size)
+
             assertEquals(Currency.USD, estimatedCurrenciesExchange?.get(0)?.currency)
+            assertEquals(expectedNewBaseAmount, estimatedCurrenciesExchange?.get(0)?.value)
+
             assertEquals(Currency.EUR, estimatedCurrenciesExchange?.get(1)?.currency)
+            assertEquals(expectedNewBaseAmount * 0.85646f, estimatedCurrenciesExchange?.get(1)?.value)
+
             assertEquals(Currency.PLN, estimatedCurrenciesExchange?.get(2)?.currency)
+            assertEquals(expectedNewBaseAmount * 3.6984f, estimatedCurrenciesExchange?.get(2)?.value)
         }
     }
 
-//    @Test
-//    fun `change base currency from EUR to PLN with no currency rates`() {
-//        viewModel.setBaseCurrency(Currency.PLN)
-//        viewModel.latestCurrencyRates = currencyRateResponseForUSD
-//        viewModel.updateExchangedCurrencies()
-//    }
+    @Test
+    fun `change base currency from EUR to PLN with no new currency rates`() {
+        val expectedNewBaseAmount = 100f * 4.3248f
+
+        viewModel.setBaseCurrency(Currency.PLN)
+        viewModel.updateExchangedCurrencies()
+
+        viewModel.estimatedCurrenciesExchange.observeForever { estimatedCurrenciesExchange ->
+            assertEquals(3, estimatedCurrenciesExchange?.size)
+
+            assertEquals(Currency.PLN, estimatedCurrenciesExchange?.get(0)?.currency)
+            assertEquals(expectedNewBaseAmount, estimatedCurrenciesExchange?.get(0)?.value)
+
+            assertEquals(Currency.EUR, estimatedCurrenciesExchange?.get(1)?.currency)
+            assertEquals(100f, estimatedCurrenciesExchange?.get(1)?.value)
+
+            assertEquals(Currency.USD, estimatedCurrenciesExchange?.get(2)?.currency)
+            assertEquals(116.52f, estimatedCurrenciesExchange?.get(2)?.value)
+        }
+
+    }
 
     private val orderedCurrencies = arrayListOf(
         Currency.EUR,
