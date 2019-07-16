@@ -85,7 +85,25 @@ class CurrencyRateViewModelTest {
             assertEquals(Currency.USD, estimatedCurrenciesExchange?.get(2)?.currency)
             assertEquals(116.52f, estimatedCurrenciesExchange?.get(2)?.value)
         }
+    }
 
+    @Test
+    fun `set amount to 0`() {
+        viewModel.setBaseCurrencyAmount(0f)
+        viewModel.updateExchangedCurrencies()
+
+        viewModel.estimatedCurrenciesExchange.observeForever { estimatedCurrenciesExchange ->
+            assertEquals(3, estimatedCurrenciesExchange?.size)
+
+            assertEquals(Currency.EUR, estimatedCurrenciesExchange?.get(0)?.currency)
+            assertEquals(0f, estimatedCurrenciesExchange?.get(0)?.value)
+
+            assertEquals(Currency.USD, estimatedCurrenciesExchange?.get(1)?.currency)
+            assertEquals(0f, estimatedCurrenciesExchange?.get(1)?.value)
+
+            assertEquals(Currency.PLN, estimatedCurrenciesExchange?.get(2)?.currency)
+            assertEquals(0f, estimatedCurrenciesExchange?.get(2)?.value)
+        }
     }
 
     private val orderedCurrencies = arrayListOf(
