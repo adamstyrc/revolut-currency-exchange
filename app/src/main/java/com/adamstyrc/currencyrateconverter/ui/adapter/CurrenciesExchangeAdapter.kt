@@ -70,6 +70,7 @@ class CurrenciesExchangeAdapter(
             } else {
                 etRateConverter.setOnFocusChangeListener { _, hasFocus ->
                     if (hasFocus) {
+                        etRateConverter.removeTextChangedListener(textChangedListener)
                         if (context is MainActivity) {
                             moveToTop()
                             setViewActions(estimatedCurrencyExchange, true)
