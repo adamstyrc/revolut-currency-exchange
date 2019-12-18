@@ -2,9 +2,10 @@ package com.adamstyrc.currencyrateconverter.util
 
 import com.adamstyrc.currencyrateconverter.model.Currency
 import com.adamstyrc.currencyrateconverter.model.Money
-import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertNull
+import junit.framework.Assert.assertTrue
 import org.junit.Test
+import java.math.BigDecimal
 
 
 class CurrencyExchangeCalculatorTest {
@@ -16,7 +17,7 @@ class CurrencyExchangeCalculatorTest {
         val exchangedCurrencyValue = currencyExchangeCalculator.calculate(
             emptyMap(),
             Currency.EUR,
-            100f
+            BigDecimal.valueOf(100)
         )
 
         assertNull(exchangedCurrencyValue)
@@ -27,10 +28,11 @@ class CurrencyExchangeCalculatorTest {
         val exchangedCurrencyValue = currencyExchangeCalculator.calculate(
             currencyRateDataForUSD,
             Currency.PLN,
-            1f
+            BigDecimal.ONE
         )
 
-        assertEquals(3.7222f, exchangedCurrencyValue?.value)
+        assertTrue(BigDecimal.valueOf(3.7222)
+            .compareTo(exchangedCurrencyValue?.value) == 0)
     }
 
     @Test
@@ -38,10 +40,11 @@ class CurrencyExchangeCalculatorTest {
         val exchangedCurrencyValue = currencyExchangeCalculator.calculate(
             currencyRateDataForUSD,
             Currency.GBP,
-            100f
+            BigDecimal.valueOf(100)
         )
 
-        assertEquals(77.424f, exchangedCurrencyValue?.value)
+        assertTrue(BigDecimal.valueOf(77.424)
+            .compareTo(exchangedCurrencyValue?.value) == 0)
     }
 
     @Test
@@ -49,10 +52,11 @@ class CurrencyExchangeCalculatorTest {
         val exchangedCurrencyValue = currencyExchangeCalculator.calculate(
             currencyRateDataForEUR,
             Currency.AUD,
-            500f
+            BigDecimal.valueOf(500)
         )
 
-        assertEquals(696.65f, exchangedCurrencyValue?.value)
+        assertTrue(BigDecimal.valueOf(696.65)
+            .compareTo(exchangedCurrencyValue?.value) == 0)
     }
 
     @Test
@@ -60,10 +64,11 @@ class CurrencyExchangeCalculatorTest {
         val exchangedCurrencyValue = currencyExchangeCalculator.calculate(
             currencyRateDataForEUR,
             Currency.AUD,
-            1000.24f
+            BigDecimal.valueOf(1000.24)
         )
 
-        assertEquals(1393.634392f, exchangedCurrencyValue?.value)
+        assertTrue(BigDecimal.valueOf(1393.634392)
+            .compareTo(exchangedCurrencyValue?.value) == 0)
     }
 
     @Test
@@ -71,20 +76,21 @@ class CurrencyExchangeCalculatorTest {
         val exchangedCurrencyValue = currencyExchangeCalculator.calculate(
             currencyRateDataForEUR,
             Currency.AUD,
-            0.0f
+            BigDecimal.ZERO
         )
 
-        assertEquals(0.0f, exchangedCurrencyValue?.value)
+        assertTrue(BigDecimal.valueOf(0.0)
+            .compareTo(exchangedCurrencyValue?.value) == 0)
     }
 
     // Data and mocks for tests
     private val currencyRateDataForUSD = HashMap<String, Money>()
-        .apply { put("EUR", 0.86195f) }
-        .apply { put("GBP", 0.77424f) }
-        .apply { put("PLN", 3.7222f) }
+        .apply { put("EUR", BigDecimal.valueOf(0.86195)) }
+        .apply { put("GBP", BigDecimal.valueOf(0.77424)) }
+        .apply { put("PLN", BigDecimal.valueOf(3.7222)) }
 
 
     private val currencyRateDataForEUR = HashMap<String, Money>()
-        .apply { put("PLN", 3.7222f) }
-        .apply { put("AUD", 1.3933f) }
+        .apply { put("PLN", BigDecimal.valueOf(3.7222)) }
+        .apply { put("AUD", BigDecimal.valueOf(1.3933)) }
 }

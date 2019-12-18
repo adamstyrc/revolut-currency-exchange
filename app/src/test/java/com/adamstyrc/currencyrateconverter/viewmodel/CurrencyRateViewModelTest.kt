@@ -1,31 +1,34 @@
 package com.adamstyrc.currencyrateconverter.viewmodel
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.adamstyrc.currencyrateconverter.api.RevolutApi
 import com.adamstyrc.currencyrateconverter.api.model.response.CurrencyRateResponse
 import com.adamstyrc.currencyrateconverter.model.Currency
+import io.reactivex.Observable
 import junit.framework.Assert.assertEquals
+import junit.framework.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import io.reactivex.Observable
-import org.junit.Rule
+import java.math.BigDecimal
 
 class CurrencyRateViewModelTest {
 
     // This rule is forced by LiveData trying to call MainThread
-    @Rule @JvmField
-    val rule : InstantTaskExecutorRule = InstantTaskExecutorRule()
+    @Rule
+    @JvmField
+    val rule: InstantTaskExecutorRule = InstantTaskExecutorRule()
 
     private var api = mock(RevolutApi::class.java)
     private lateinit var viewModel: CurrencyRateViewModel
 
     @Before
     fun init() {
-        `when`(api.get(Currency.EUR.name))
+        `when`(api.getLatest(Currency.EUR.name))
             .thenReturn(Observable.just(currencyRateResponseForEUR))
-        `when`(api.get(Currency.USD.name))
+        `when`(api.getLatest(Currency.USD.name))
             .thenReturn(Observable.just(currencyRateResponseForEUR))
 
         viewModel = CurrencyRateViewModel(api)
@@ -40,19 +43,22 @@ class CurrencyRateViewModelTest {
             assertEquals(3, estimatedCurrenciesExchange?.size)
 
             assertEquals(Currency.EUR, estimatedCurrenciesExchange?.get(0)?.currency)
-            assertEquals(100f, estimatedCurrenciesExchange?.get(0)?.value)
+            assertTrue(BigDecimal.valueOf(100)
+                .compareTo(estimatedCurrenciesExchange?.get(0)?.value) == 0)
 
             assertEquals(Currency.USD, estimatedCurrenciesExchange?.get(1)?.currency)
-            assertEquals(116.52f, estimatedCurrenciesExchange?.get(1)?.value)
+            assertTrue(BigDecimal.valueOf(116.52)
+                .compareTo(estimatedCurrenciesExchange?.get(1)?.value) == 0)
 
             assertEquals(Currency.PLN, estimatedCurrenciesExchange?.get(2)?.currency)
-            assertEquals(432.48f, estimatedCurrenciesExchange?.get(2)?.value)
+            assertTrue(BigDecimal.valueOf(432.48)
+                .compareTo(estimatedCurrenciesExchange?.get(2)?.value) == 0)
         }
     }
 
     @Test
     fun `change base currency from EUR to USD with new currency rates`() {
-        val expectedNewBaseAmount = 100f * 1.1652f
+        val expectedNewBaseAmount = BigDecimal.valueOf(116.52)
 
         viewModel.setBaseCurrency(Currency.USD)
         viewModel.latestCurrencyRates = currencyRateResponseForUSD
@@ -62,19 +68,22 @@ class CurrencyRateViewModelTest {
             assertEquals(3, estimatedCurrenciesExchange?.size)
 
             assertEquals(Currency.USD, estimatedCurrenciesExchange?.get(0)?.currency)
-            assertEquals(expectedNewBaseAmount, estimatedCurrenciesExchange?.get(0)?.value)
+            assertTrue(expectedNewBaseAmount
+                .compareTo(estimatedCurrenciesExchange?.get(0)?.value) == 0)
 
             assertEquals(Currency.EUR, estimatedCurrenciesExchange?.get(1)?.currency)
-            assertEquals(expectedNewBaseAmount * 0.85646f, estimatedCurrenciesExchange?.get(1)?.value)
+            assertTrue(expectedNewBaseAmount.multiply(BigDecimal.valueOf(0.85646))
+                .compareTo(estimatedCurrenciesExchange?.get(1)?.value) == 0)
 
             assertEquals(Currency.PLN, estimatedCurrenciesExchange?.get(2)?.currency)
-            assertEquals(expectedNewBaseAmount * 3.6984f, estimatedCurrenciesExchange?.get(2)?.value)
+            assertTrue(expectedNewBaseAmount.multiply(BigDecimal.valueOf(3.6984))
+                .compareTo(estimatedCurrenciesExchange?.get(2)?.value) == 0)
         }
     }
 
     @Test
     fun `change base currency from EUR to PLN with no new currency rates`() {
-        val expectedNewBaseAmount = 100f * 4.3248f
+        val expectedNewBaseAmount = BigDecimal.valueOf(432.48)
 
         viewModel.setBaseCurrency(Currency.PLN)
         viewModel.updateExchangedCurrencies()
@@ -83,51 +92,60 @@ class CurrencyRateViewModelTest {
             assertEquals(3, estimatedCurrenciesExchange?.size)
 
             assertEquals(Currency.PLN, estimatedCurrenciesExchange?.get(0)?.currency)
-            assertEquals(expectedNewBaseAmount, estimatedCurrenciesExchange?.get(0)?.value)
+            assertTrue(expectedNewBaseAmount
+                .compareTo(estimatedCurrenciesExchange?.get(0)?.value) == 0)
 
             assertEquals(Currency.EUR, estimatedCurrenciesExchange?.get(1)?.currency)
-            assertEquals(100f, estimatedCurrenciesExchange?.get(1)?.value)
+            assertTrue(BigDecimal.valueOf(100)
+                .compareTo(estimatedCurrenciesExchange?.get(1)?.value) == 0)
 
             assertEquals(Currency.USD, estimatedCurrenciesExchange?.get(2)?.currency)
-            assertEquals(116.52f, estimatedCurrenciesExchange?.get(2)?.value)
+            assertTrue(BigDecimal.valueOf(116.52)
+                .compareTo(estimatedCurrenciesExchange?.get(2)?.value) == 0)
         }
     }
 
     @Test
     fun `set amount to 0`() {
-        viewModel.setBaseCurrencyAmount(0f)
+        viewModel.setBaseCurrencyAmount(BigDecimal.ZERO)
         viewModel.updateExchangedCurrencies()
 
         viewModel.estimatedCurrenciesExchange.observeForever { estimatedCurrenciesExchange ->
             assertEquals(3, estimatedCurrenciesExchange?.size)
 
             assertEquals(Currency.EUR, estimatedCurrenciesExchange?.get(0)?.currency)
-            assertEquals(0f, estimatedCurrenciesExchange?.get(0)?.value)
+            assertTrue(BigDecimal.ZERO
+                .compareTo(estimatedCurrenciesExchange?.get(1)?.value) == 0)
 
             assertEquals(Currency.USD, estimatedCurrenciesExchange?.get(1)?.currency)
-            assertEquals(0f, estimatedCurrenciesExchange?.get(1)?.value)
+            assertTrue(BigDecimal.ZERO
+                .compareTo(estimatedCurrenciesExchange?.get(1)?.value) == 0)
 
             assertEquals(Currency.PLN, estimatedCurrenciesExchange?.get(2)?.currency)
-            assertEquals(0f, estimatedCurrenciesExchange?.get(2)?.value)
+            assertTrue(BigDecimal.ZERO
+                .compareTo(estimatedCurrenciesExchange?.get(2)?.value) == 0)
         }
     }
 
     @Test
     fun `set amount to 999,99`() {
-        viewModel.setBaseCurrencyAmount(999.99f)
+        viewModel.setBaseCurrencyAmount(BigDecimal.valueOf(999.99))
         viewModel.updateExchangedCurrencies()
 
         viewModel.estimatedCurrenciesExchange.observeForever { estimatedCurrenciesExchange ->
             assertEquals(3, estimatedCurrenciesExchange?.size)
 
             assertEquals(Currency.EUR, estimatedCurrenciesExchange?.get(0)?.currency)
-            assertEquals(999.99f, estimatedCurrenciesExchange?.get(0)?.value)
+            assertTrue(BigDecimal.valueOf(999.99)
+                .compareTo(estimatedCurrenciesExchange?.get(0)?.value) == 0)
 
             assertEquals(Currency.USD, estimatedCurrenciesExchange?.get(1)?.currency)
-            assertEquals(1165.188348f, estimatedCurrenciesExchange?.get(1)?.value)
+            assertTrue(BigDecimal.valueOf(1165.188348)
+                .compareTo(estimatedCurrenciesExchange?.get(1)?.value) == 0)
 
             assertEquals(Currency.PLN, estimatedCurrenciesExchange?.get(2)?.currency)
-            assertEquals(4324.756752f, estimatedCurrenciesExchange?.get(2)?.value)
+            assertTrue(BigDecimal.valueOf(4324.756752)
+                .compareTo(estimatedCurrenciesExchange?.get(2)?.value) == 0)
         }
     }
 
@@ -137,13 +155,17 @@ class CurrencyRateViewModelTest {
         Currency.PLN
     )
     private val currencyRateResponseForEUR = CurrencyRateResponse()
-        .apply { base = "EUR"; rates = hashMapOf(
-            Pair("USD", 1.1652f),
-            Pair("PLN", 4.3248f)
-        )}
+        .apply {
+            base = "EUR"; rates = hashMapOf(
+            Pair("USD", BigDecimal.valueOf(1.1652)),
+            Pair("PLN", BigDecimal.valueOf(4.3248))
+        )
+        }
     private val currencyRateResponseForUSD = CurrencyRateResponse()
-        .apply { base = "USD"; rates = hashMapOf(
-            Pair("EUR", 0.85646f),
-            Pair("PLN", 3.6984f)
-        )}
+        .apply {
+            base = "USD"; rates = hashMapOf(
+            Pair("EUR", BigDecimal.valueOf(0.85646)),
+            Pair("PLN", BigDecimal.valueOf(3.6984))
+        )
+        }
 }
