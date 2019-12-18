@@ -37,7 +37,7 @@ class CurrenciesExchangeAdapter(
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
         override fun onTextChanged(input: CharSequence?, start: Int, before: Int, count: Int) {
-            input.toString().toFloatOrNull()?.let { amount ->
+            input.toString().toBigDecimalOrNull()?.let { amount ->
                 if (context is MainActivity) {
                     context.setBaseCurrencyAmount(amount)
                 }

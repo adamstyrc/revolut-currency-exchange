@@ -1,6 +1,7 @@
 package com.adamstyrc.currencyrateconverter.util
 
 import com.adamstyrc.currencyrateconverter.model.Currency
+import com.adamstyrc.currencyrateconverter.model.Money
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertNull
 import org.junit.Test
@@ -77,13 +78,13 @@ class CurrencyExchangeCalculatorTest {
     }
 
     // Data and mocks for tests
-    private val currencyRateDataForUSD = HashMap<String, Float>()
+    private val currencyRateDataForUSD = HashMap<String, Money>()
         .apply { put("EUR", 0.86195f) }
         .apply { put("GBP", 0.77424f) }
         .apply { put("PLN", 3.7222f) }
 
 
-    private val currencyRateDataForEUR = HashMap<String, Float>()
+    private val currencyRateDataForEUR = HashMap<String, Money>()
         .apply { put("PLN", 3.7222f) }
         .apply { put("AUD", 1.3933f) }
 }

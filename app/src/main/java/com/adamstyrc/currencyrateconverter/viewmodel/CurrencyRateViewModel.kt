@@ -6,10 +6,12 @@ import com.adamstyrc.currencyrateconverter.api.RevolutApi
 import com.adamstyrc.currencyrateconverter.api.model.response.CurrencyRateResponse
 import com.adamstyrc.currencyrateconverter.model.Currency
 import com.adamstyrc.currencyrateconverter.model.EstimatedCurrencyExchange
+import com.adamstyrc.currencyrateconverter.model.Money
 import com.adamstyrc.currencyrateconverter.util.CurrencyExchangeCalculator
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
+import java.math.BigDecimal
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -25,7 +27,7 @@ class CurrencyRateViewModel @Inject constructor(
         .apply { value = ArrayList() }
     var orderedCurrencies = arrayListOf<Currency>()
     internal var latestCurrencyRates: CurrencyRateResponse? = null
-    private var baseCurrencyAmount = 100f
+    private var baseCurrencyAmount = BigDecimal(100)
     private var currencyExchangeCalculator = CurrencyExchangeCalculator()
     private var disposable: Disposable? = null
 
@@ -44,7 +46,7 @@ class CurrencyRateViewModel @Inject constructor(
         disposable = null
     }
 
-    fun setBaseCurrencyAmount(amount: Float) {
+    fun setBaseCurrencyAmount(amount: Money) {
         baseCurrencyAmount = amount
         updateExchangedCurrencies()
     }

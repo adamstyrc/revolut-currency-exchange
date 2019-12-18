@@ -10,6 +10,7 @@ import com.adamstyrc.currencyrateconverter.R
 import com.adamstyrc.currencyrateconverter.dagger.InjectionGraph
 import com.adamstyrc.currencyrateconverter.model.EstimatedCurrencyExchange
 import com.adamstyrc.currencyrateconverter.model.Currency
+import com.adamstyrc.currencyrateconverter.model.Money
 import com.adamstyrc.currencyrateconverter.ui.adapter.CurrenciesExchangeAdapter
 import com.adamstyrc.currencyrateconverter.viewmodel.CurrencyRateViewModel
 import kotlinx.android.synthetic.main.activity_main.*
@@ -57,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.cancelUpdatingCurrencyRates()
     }
 
-    fun setBaseCurrencyAmount(amount: Float) {
+    fun setBaseCurrencyAmount(amount: Money) {
         viewModel.setBaseCurrencyAmount(amount)
     }
 
