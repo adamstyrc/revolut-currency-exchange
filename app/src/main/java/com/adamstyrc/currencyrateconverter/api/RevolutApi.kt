@@ -8,7 +8,7 @@ import retrofit2.http.Query
 interface RevolutApi {
 
     @GET("latest")
-    fun get(@Query("base") currency: String) : Observable<CurrencyRateResponse>
+    fun getLatest(@Query("base") currency: String) : Observable<CurrencyRateResponse>
 
 
 }
