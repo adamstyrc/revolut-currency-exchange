@@ -11,6 +11,18 @@ class CurrencyExchangeCalculatorTest {
 
     private val currencyExchangeCalculator = CurrencyExchangeCalculator()
 
+    // Data and mocks for tests
+    private val currencyRateDataForUSD = hashMapOf(
+        Currency.EUR to BigDecimal.valueOf(0.86195),
+        Currency.GBP to BigDecimal.valueOf(0.77424),
+        Currency.PLN to BigDecimal.valueOf(3.7222)
+    )
+
+    private val currencyRateDataForEUR = hashMapOf(
+        Currency.PLN to BigDecimal.valueOf(3.7222),
+        Currency.AUD to BigDecimal.valueOf(1.3933)
+    )
+
     @Test
     fun noResultWhenCurrencyNotProvided() {
         val exchangedCurrencyValue = currencyExchangeCalculator.calculate(
@@ -82,15 +94,4 @@ class CurrencyExchangeCalculatorTest {
         assertThat(exchangedCurrencyValue?.value)
             .isEqualToIgnoringScale(BigDecimal.valueOf(0.0))
     }
-
-    // Data and mocks for tests
-    private val currencyRateDataForUSD = HashMap<String, Money>()
-        .apply { put("EUR", BigDecimal.valueOf(0.86195)) }
-        .apply { put("GBP", BigDecimal.valueOf(0.77424)) }
-        .apply { put("PLN", BigDecimal.valueOf(3.7222)) }
-
-
-    private val currencyRateDataForEUR = HashMap<String, Money>()
-        .apply { put("PLN", BigDecimal.valueOf(3.7222)) }
-        .apply { put("AUD", BigDecimal.valueOf(1.3933)) }
 }
