@@ -25,12 +25,13 @@ class CurrencyRateViewModel @Inject constructor(
         const val AUTO_REFRESH_PERIOD_IN_SECONDS = 1L
     }
 
-    private val estimatedCurrenciesExchange =
-        MutableLiveData<MutableList<EstimatedCurrencyExchange>>(arrayListOf())
     private var demandedCurrencies: MutableList<Currency> = ArrayList(Currency.values().toList())
     private var latestCurrencyValuation: CurrencyValuation? = null
     private var baseCurrencyAmount = BigDecimal(100.00)
     private var currencyExchangeCalculator = CurrencyExchangeCalculator()
+
+    private val estimatedCurrenciesExchange =
+        MutableLiveData<MutableList<EstimatedCurrencyExchange>>(arrayListOf())
     private var disposable = Disposables.disposed()
 
     override fun onCleared() {
@@ -56,10 +57,12 @@ class CurrencyRateViewModel @Inject constructor(
                     .toObservable()
             }
             .retry()
-            .subscribeBy(onNext = { currencyRateData ->
-                latestCurrencyValuation = currencyRateData
-                updateExchangedCurrencies()
-            }, onError = {})
+            .subscribeBy(
+                onNext = { currencyRateData ->
+                    latestCurrencyValuation = currencyRateData
+                    updateExchangedCurrencies()
+                },
+                onError = {})
     }
 
     fun cancelUpdatingCurrencyRates() {
@@ -86,7 +89,8 @@ class CurrencyRateViewModel @Inject constructor(
     fun updateExchangedCurrencies() {
         val currencyRates = latestCurrencyValuation
         if (currencyRates == null
-            || currencyRates.base != getBaseCurrency()) {
+            || currencyRates.base != getBaseCurrency()
+        ) {
             orderEstimatedCurrenciesExchange()
             return
         }
