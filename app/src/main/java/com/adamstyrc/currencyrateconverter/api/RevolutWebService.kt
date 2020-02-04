@@ -30,7 +30,6 @@ class RevolutWebService(
         val retrofit = Retrofit.Builder()
             .baseUrl(SERVER_ADDRESS)
             .addConverterFactory(GsonConverterFactory.create(gson))
-            .addCallAdapterFactory(RxObserveOnMainTheadCallAdapter())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
             .client(provideHttpClient())
             .build()
