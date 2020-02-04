@@ -4,10 +4,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.adamstyrc.currencyrateconverter.api.RevolutApi
 import com.adamstyrc.currencyrateconverter.api.model.response.CurrencyRateResponse
-import com.adamstyrc.currencyrateconverter.model.Currency
 import com.adamstyrc.currencyrateconverter.model.EstimatedCurrencyExchange
 import com.adamstyrc.currencyrateconverter.model.Money
 import com.adamstyrc.currencyrateconverter.util.CurrencyExchangeCalculator
+import com.revolut.domain.model.Currency
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposables
 import io.reactivex.rxkotlin.subscribeBy
@@ -23,8 +23,8 @@ class CurrencyRateViewModel @Inject constructor(
         const val AUTO_REFRESH_PERIOD_IN_SECONDS = 1L
     }
 
-    val estimatedCurrenciesExchange = MutableLiveData<ArrayList<EstimatedCurrencyExchange>>()
-        .apply { value = ArrayList() }
+    val estimatedCurrenciesExchange =
+        MutableLiveData<MutableList<EstimatedCurrencyExchange>>(arrayListOf())
     var orderedCurrencies = arrayListOf<Currency>()
     internal var latestCurrencyRates: CurrencyRateResponse? = null
     private var baseCurrencyAmount = BigDecimal(100.00)

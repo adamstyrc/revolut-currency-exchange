@@ -1,7 +1,7 @@
 package com.adamstyrc.currencyrateconverter.util
 
-import com.adamstyrc.currencyrateconverter.model.Currency
 import com.adamstyrc.currencyrateconverter.model.Money
+import com.revolut.domain.model.Currency
 import junit.framework.Assert.assertNull
 import junit.framework.Assert.assertTrue
 import org.junit.Test

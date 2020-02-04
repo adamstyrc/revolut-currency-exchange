@@ -15,7 +15,7 @@ import com.adamstyrc.currencyrateconverter.ui.activity.MainActivity
 
 class CurrenciesExchangeAdapter(
     val context: Context,
-    var items: ArrayList<EstimatedCurrencyExchange>
+    var items: MutableList<EstimatedCurrencyExchange>
 ) : RecyclerView.Adapter<CurrenciesExchangeAdapter.ViewHolder>() {
 
     override fun getItemCount() = items.size

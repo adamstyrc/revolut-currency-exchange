@@ -3,7 +3,7 @@ package com.adamstyrc.currencyrateconverter.viewmodel
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.adamstyrc.currencyrateconverter.api.RevolutApi
 import com.adamstyrc.currencyrateconverter.api.model.response.CurrencyRateResponse
-import com.adamstyrc.currencyrateconverter.model.Currency
+import com.revolut.domain.model.Currency
 import io.reactivex.Observable
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertTrue

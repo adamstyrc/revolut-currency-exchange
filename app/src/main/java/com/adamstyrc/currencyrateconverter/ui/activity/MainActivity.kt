@@ -9,10 +9,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.adamstyrc.currencyrateconverter.R
 import com.adamstyrc.currencyrateconverter.dagger.InjectionGraph
 import com.adamstyrc.currencyrateconverter.model.EstimatedCurrencyExchange
-import com.adamstyrc.currencyrateconverter.model.Currency
 import com.adamstyrc.currencyrateconverter.model.Money
 import com.adamstyrc.currencyrateconverter.ui.adapter.CurrenciesExchangeAdapter
 import com.adamstyrc.currencyrateconverter.viewmodel.CurrencyRateViewModel
+import com.revolut.domain.model.Currency
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
@@ -30,15 +30,8 @@ class MainActivity : AppCompatActivity() {
         InjectionGraph.Manager.init(this).inject(this)
         viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(CurrencyRateViewModel::class.java)
-        viewModel.orderedCurrencies = arrayListOf(
-            Currency.EUR,
-            Currency.USD,
-            Currency.GBP,
-            Currency.AUD,
-            Currency.PLN,
-            Currency.JPY,
-            Currency.CZK
-        )
+
+        viewModel.orderedCurrencies = ArrayList(Currency.values().toList())
 
         rvCurrencyRates.layoutManager = LinearLayoutManager(this)
         rvCurrencyRates.adapter = currenciesRateAdapter
@@ -66,8 +59,12 @@ class MainActivity : AppCompatActivity() {
         viewModel.setBaseCurrency(currency)
     }
 
-    private fun updateExchangedCurrencies(currencyExchangeRates: ArrayList<EstimatedCurrencyExchange>) {
+    private fun updateExchangedCurrencies(
+        currencyExchangeRates: MutableList<EstimatedCurrencyExchange>
+    ) {
         currenciesRateAdapter.items = currencyExchangeRates
-        currenciesRateAdapter.notifyItemRangeChanged(1, currenciesRateAdapter.itemCount - 1)
+        currenciesRateAdapter.notifyItemRangeChanged(
+            1,
+            currenciesRateAdapter.itemCount - 1)
     }
 }
