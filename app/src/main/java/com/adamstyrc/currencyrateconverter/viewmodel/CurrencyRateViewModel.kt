@@ -4,10 +4,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.adamstyrc.currencyrateconverter.api.RevolutApi
 import com.adamstyrc.currencyrateconverter.api.model.response.CurrencyRateResponse
-import com.adamstyrc.currencyrateconverter.model.EstimatedCurrencyExchange
-import com.adamstyrc.currencyrateconverter.model.Money
-import com.adamstyrc.currencyrateconverter.util.CurrencyExchangeCalculator
+import com.revolut.domain.Money
+import com.revolut.domain.calculator.CurrencyExchangeCalculator
 import com.revolut.domain.model.Currency
+import com.revolut.domain.model.EstimatedCurrencyExchange
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposables
 import io.reactivex.rxkotlin.subscribeBy

@@ -1,8 +1,8 @@
-package com.adamstyrc.currencyrateconverter.util
+package com.revolut.domain.calculator
 
-import com.adamstyrc.currencyrateconverter.model.EstimatedCurrencyExchange
-import com.adamstyrc.currencyrateconverter.model.Money
+import com.revolut.domain.Money
 import com.revolut.domain.model.Currency
+import com.revolut.domain.model.EstimatedCurrencyExchange
 
 class CurrencyExchangeCalculator {
 

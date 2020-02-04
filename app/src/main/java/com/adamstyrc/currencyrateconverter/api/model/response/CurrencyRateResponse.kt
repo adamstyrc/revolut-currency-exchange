@@ -1,7 +1,7 @@
 package com.adamstyrc.currencyrateconverter.api.model.response
 
-import com.adamstyrc.currencyrateconverter.model.Money
 import com.google.gson.annotations.SerializedName
+import com.revolut.domain.Money
 
 class CurrencyRateResponse {
 

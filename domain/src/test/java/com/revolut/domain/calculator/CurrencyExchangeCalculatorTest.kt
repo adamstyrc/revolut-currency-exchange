@@ -1,9 +1,8 @@
-package com.adamstyrc.currencyrateconverter.util
+package com.revolut.domain.calculator
 
-import com.adamstyrc.currencyrateconverter.model.Money
+import com.google.common.truth.Truth.assertThat
+import com.revolut.domain.Money
 import com.revolut.domain.model.Currency
-import junit.framework.Assert.assertNull
-import junit.framework.Assert.assertTrue
 import org.junit.Test
 import java.math.BigDecimal
 
@@ -20,7 +19,8 @@ class CurrencyExchangeCalculatorTest {
             BigDecimal.valueOf(100)
         )
 
-        assertNull(exchangedCurrencyValue)
+        assertThat(exchangedCurrencyValue)
+            .isNull()
     }
 
     @Test
@@ -31,8 +31,8 @@ class CurrencyExchangeCalculatorTest {
             BigDecimal.ONE
         )
 
-        assertTrue(BigDecimal.valueOf(3.7222)
-            .compareTo(exchangedCurrencyValue?.value) == 0)
+        assertThat(exchangedCurrencyValue?.value)
+            .isEqualToIgnoringScale(BigDecimal.valueOf(3.7222))
     }
 
     @Test
@@ -43,8 +43,8 @@ class CurrencyExchangeCalculatorTest {
             BigDecimal.valueOf(100)
         )
 
-        assertTrue(BigDecimal.valueOf(77.424)
-            .compareTo(exchangedCurrencyValue?.value) == 0)
+        assertThat(exchangedCurrencyValue?.value)
+            .isEqualToIgnoringScale(BigDecimal.valueOf(77.424))
     }
 
     @Test
@@ -55,8 +55,8 @@ class CurrencyExchangeCalculatorTest {
             BigDecimal.valueOf(500)
         )
 
-        assertTrue(BigDecimal.valueOf(696.65)
-            .compareTo(exchangedCurrencyValue?.value) == 0)
+        assertThat(exchangedCurrencyValue?.value)
+            .isEqualToIgnoringScale(BigDecimal.valueOf(696.65))
     }
 
     @Test
@@ -67,8 +67,8 @@ class CurrencyExchangeCalculatorTest {
             BigDecimal.valueOf(1000.24)
         )
 
-        assertTrue(BigDecimal.valueOf(1393.634392)
-            .compareTo(exchangedCurrencyValue?.value) == 0)
+        assertThat(exchangedCurrencyValue?.value)
+            .isEqualToIgnoringScale(BigDecimal.valueOf(1393.634392))
     }
 
     @Test
@@ -79,8 +79,8 @@ class CurrencyExchangeCalculatorTest {
             BigDecimal.ZERO
         )
 
-        assertTrue(BigDecimal.valueOf(0.0)
-            .compareTo(exchangedCurrencyValue?.value) == 0)
+        assertThat(exchangedCurrencyValue?.value)
+            .isEqualToIgnoringScale(BigDecimal.valueOf(0.0))
     }
 
     // Data and mocks for tests

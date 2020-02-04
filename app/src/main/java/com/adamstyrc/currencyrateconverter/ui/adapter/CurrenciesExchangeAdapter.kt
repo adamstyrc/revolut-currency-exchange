@@ -9,9 +9,9 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.adamstyrc.currencyrateconverter.model.EstimatedCurrencyExchange
 import com.adamstyrc.currencyrateconverter.R
 import com.adamstyrc.currencyrateconverter.ui.activity.MainActivity
+import com.revolut.domain.model.EstimatedCurrencyExchange
 
 class CurrenciesExchangeAdapter(
     val context: Context,

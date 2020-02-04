@@ -8,11 +8,11 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.adamstyrc.currencyrateconverter.R
 import com.adamstyrc.currencyrateconverter.dagger.InjectionGraph
-import com.adamstyrc.currencyrateconverter.model.EstimatedCurrencyExchange
-import com.adamstyrc.currencyrateconverter.model.Money
 import com.adamstyrc.currencyrateconverter.ui.adapter.CurrenciesExchangeAdapter
 import com.adamstyrc.currencyrateconverter.viewmodel.CurrencyRateViewModel
+import com.revolut.domain.Money
 import com.revolut.domain.model.Currency
+import com.revolut.domain.model.EstimatedCurrencyExchange
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
