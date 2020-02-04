@@ -1,12 +1,14 @@
 package com.adamstyrc.currencyrateconverter.viewmodel
 
+import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.adamstyrc.currencyrateconverter.api.RevolutApi
-import com.adamstyrc.currencyrateconverter.api.model.response.CurrencyRateResponse
 import com.revolut.domain.Money
 import com.revolut.domain.calculator.CurrencyExchangeCalculator
 import com.revolut.domain.model.Currency
+import com.revolut.domain.model.CurrencyValuation
 import com.revolut.domain.model.EstimatedCurrencyExchange
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposables
@@ -23,21 +25,39 @@ class CurrencyRateViewModel @Inject constructor(
         const val AUTO_REFRESH_PERIOD_IN_SECONDS = 1L
     }
 
-    val estimatedCurrenciesExchange =
+    private val estimatedCurrenciesExchange =
         MutableLiveData<MutableList<EstimatedCurrencyExchange>>(arrayListOf())
-    var orderedCurrencies = arrayListOf<Currency>()
-    internal var latestCurrencyRates: CurrencyRateResponse? = null
+    private var demandedCurrencies: MutableList<Currency> = ArrayList(Currency.values().toList())
+    private var latestCurrencyValuation: CurrencyValuation? = null
     private var baseCurrencyAmount = BigDecimal(100.00)
     private var currencyExchangeCalculator = CurrencyExchangeCalculator()
     private var disposable = Disposables.disposed()
 
+    override fun onCleared() {
+        super.onCleared()
+
+        disposable.dispose()
+    }
+
+    fun getEstimatedCurrencyExchange(): LiveData<MutableList<EstimatedCurrencyExchange>> =
+        estimatedCurrenciesExchange
+
+    fun setDemandedCurrencies(currencies: List<Currency>) {
+        demandedCurrencies = ArrayList(currencies)
+    }
+
     fun startUpdatingCurrencyRates() {
         // TODO consider rewriting so the first request is fired instantly and others every second
         disposable = Observable.interval(AUTO_REFRESH_PERIOD_IN_SECONDS, TimeUnit.SECONDS)
-            .flatMap { api.getLatest(getBaseCurrency().name) }
+            .flatMap {
+                api.getLatest(getBaseCurrency().name)
+                    .filter { it.isValid() }
+                    .map { it.toDomainModel() }
+                    .toObservable()
+            }
             .retry()
             .subscribeBy(onNext = { currencyRateData ->
-                latestCurrencyRates = currencyRateData
+                latestCurrencyValuation = currencyRateData
                 updateExchangedCurrencies()
             }, onError = {})
     }
@@ -53,8 +73,8 @@ class CurrencyRateViewModel @Inject constructor(
 
     fun setBaseCurrency(currency: Currency) {
         cancelUpdatingCurrencyRates()
-        orderedCurrencies.remove(currency)
-        orderedCurrencies.add(0, currency)
+        demandedCurrencies.remove(currency)
+        demandedCurrencies.add(0, currency)
 
         baseCurrencyAmount = estimatedCurrenciesExchange.value
             ?.find { it.currency == currency }
@@ -63,41 +83,53 @@ class CurrencyRateViewModel @Inject constructor(
         startUpdatingCurrencyRates()
     }
 
-    internal fun updateExchangedCurrencies() {
-        val currencyRates = latestCurrencyRates
-        if (currencyRates?.rates == null || currencyRates.base != getBaseCurrency().name) {
+    fun updateExchangedCurrencies() {
+        val currencyRates = latestCurrencyValuation
+        if (currencyRates == null
+            || currencyRates.base != getBaseCurrency()) {
             orderEstimatedCurrenciesExchange()
             return
         }
 
-        val latestExchangedByBaseCurrencies = orderedCurrencies.map { currency ->
-            if (currency == orderedCurrencies[0]) {
-                return@map EstimatedCurrencyExchange(currency, baseCurrencyAmount)
-            }
+        val latestExchangedByBaseCurrencies =
+            demandedCurrencies.map { currency ->
+                if (currency == demandedCurrencies[0]) {
+                    return@map EstimatedCurrencyExchange(currency, baseCurrencyAmount)
+                }
 
-            currencyExchangeCalculator.calculate(
-                currencyRates.rates!!,
-                currency,
-                baseCurrencyAmount)?.let { estimatedCurrenciesExchange ->
-                return@map estimatedCurrenciesExchange
-            }
+                currencyExchangeCalculator.calculate(
+                    currencyRates.rates,
+                    currency,
+                    baseCurrencyAmount
+                )?.let { estimatedCurrenciesExchange ->
+                    return@map estimatedCurrenciesExchange
+                }
 
-            return
-        }
+                return
+            }
 
         estimatedCurrenciesExchange.postValue(ArrayList(latestExchangedByBaseCurrencies))
     }
 
+    @VisibleForTesting
+    fun setLatestCurrencyValuation(currencyValuation: CurrencyValuation?) {
+        latestCurrencyValuation = currencyValuation
+    }
+
     private fun orderEstimatedCurrenciesExchange() {
-        val estimatedCurrenciesExchangeList = estimatedCurrenciesExchange.value
-        if (estimatedCurrenciesExchangeList != null && estimatedCurrenciesExchangeList.isNotEmpty()) {
-            val orderedEstimatedCurrenciesExchangeList = orderedCurrencies.map { currency ->
-                estimatedCurrenciesExchangeList.find { it.currency == currency }!!
-            }
+        val estimatedCurrenciesExchangeList =
+            estimatedCurrenciesExchange.value
+        if (estimatedCurrenciesExchangeList != null
+            && estimatedCurrenciesExchangeList.isNotEmpty()
+        ) {
+            val orderedEstimatedCurrenciesExchangeList =
+                demandedCurrencies.map { currency ->
+                    estimatedCurrenciesExchangeList.find { it.currency == currency }!!
+                }
             estimatedCurrenciesExchange.postValue(ArrayList(orderedEstimatedCurrenciesExchangeList))
         }
     }
 
-    private fun getBaseCurrency()  = orderedCurrencies[0]
+    private fun getBaseCurrency() = demandedCurrencies[0]
 
 }

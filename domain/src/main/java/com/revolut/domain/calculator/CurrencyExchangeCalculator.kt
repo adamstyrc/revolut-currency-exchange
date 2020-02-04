@@ -7,11 +7,11 @@ import com.revolut.domain.model.EstimatedCurrencyExchange
 class CurrencyExchangeCalculator {
 
     fun calculate(
-        currencyRatesData: Map<String, Money>,
+        currencyRatesData: Map<Currency, Money>,
         wantedCurrency: Currency,
         exchangedValue: Money
     ) : EstimatedCurrencyExchange? {
-        val exchangeRate = currencyRatesData[wantedCurrency.name]
+        val exchangeRate = currencyRatesData[wantedCurrency]
 
         if (exchangeRate != null) {
             val calculatedValue = exchangeRate * exchangedValue

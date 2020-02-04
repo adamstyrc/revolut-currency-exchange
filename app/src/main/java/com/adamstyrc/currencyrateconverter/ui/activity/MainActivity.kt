@@ -31,12 +31,10 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProviders.of(this, viewModelFactory)
             .get(CurrencyRateViewModel::class.java)
 
-        viewModel.orderedCurrencies = ArrayList(Currency.values().toList())
-
         rvCurrencyRates.layoutManager = LinearLayoutManager(this)
         rvCurrencyRates.adapter = currenciesRateAdapter
 
-        viewModel.estimatedCurrenciesExchange.observe(this, Observer { currencyRates ->
+        viewModel.getEstimatedCurrencyExchange().observe(this, Observer { currencyRates ->
             updateExchangedCurrencies(currencyRates)
         })
     }
