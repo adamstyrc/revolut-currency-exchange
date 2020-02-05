@@ -11,7 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.revolut.currencycalculator.R
-import com.revolut.currencycalculator.model.CurrencyIcons
+import com.revolut.currencycalculator.model.CurrenciesInfo
 import com.revolut.currencycalculator.ui.activity.MainActivity
 import com.revolut.currencycalculator.utils.Logger
 import com.revolut.domain.Money
@@ -53,17 +53,16 @@ class CurrenciesExchangeAdapter(
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var ivCurrencyIcon: ImageView = itemView.findViewById(R.id.ivCurrencyIcon)
-        var tvCurrencyName: TextView = itemView.findViewById(R.id.tvCurrencyName)
-        var etRateConverter: EditText = itemView.findViewById(R.id.etRate)
+        private var ivCurrencyIcon: ImageView = itemView.findViewById(R.id.ivCurrencyIcon)
+        private var tvCurrencyName: TextView = itemView.findViewById(R.id.tvCurrencyName)
+        private var tvCurrencySymbol: TextView = itemView.findViewById(R.id.tvCurrencySymbol)
+        private var etRateConverter: EditText = itemView.findViewById(R.id.etRate)
 
         fun bindCurrencyRate(
             position: Int,
             estimatedCurrencyExchange: EstimatedCurrencyExchange
         ) {
-            val icon = CurrencyIcons.getIcon(estimatedCurrencyExchange.currency)
-            ivCurrencyIcon.setImageResource(icon)
-            tvCurrencyName.text = estimatedCurrencyExchange.currency.name
+            setCurrency(estimatedCurrencyExchange.currency)
 
             //TODO decide about rounding to 2 last digits
             val formattedValue = "%.2f".format(estimatedCurrencyExchange.value)
@@ -73,6 +72,20 @@ class CurrenciesExchangeAdapter(
             etRateConverter.setText(formattedValue)
 
             setViewActions(position, estimatedCurrencyExchange)
+        }
+
+        private fun setCurrency(currency: Currency) {
+            val icon = CurrenciesInfo.getIcon(currency)
+                ?: R.drawable.ic_currency_unknown
+            ivCurrencyIcon.setImageResource(icon)
+
+            val stringRes = CurrenciesInfo.getNameRes(currency)
+            if (stringRes != null) {
+                tvCurrencyName.setText(stringRes)
+            } else {
+                tvCurrencyName.text = ""
+            }
+            tvCurrencySymbol.text = currency.name
         }
 
         private fun setViewActions(

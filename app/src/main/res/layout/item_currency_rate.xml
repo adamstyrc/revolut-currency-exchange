@@ -6,13 +6,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:paddingLeft="@dimen/general_margin"
     android:paddingRight="@dimen/general_margin"
-    android:paddingTop="@dimen/small_margin"
-    android:paddingBottom="@dimen/small_margin">
+    android:paddingTop="@dimen/medium_margin"
+    android:paddingBottom="@dimen/medium_margin">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/vGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5" />
 
     <ImageView
         android:id="@+id/ivCurrencyIcon"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         tools:src="@drawable/ic_currency_unknown"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -22,11 +29,23 @@
         android:id="@+id/tvCurrencyName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/big_margin"
+        android:layout_marginStart="@dimen/general_margin"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        tools:text="US Dollar"
+        app:layout_constraintBottom_toBottomOf="@id/vGuideline"
+        app:layout_constraintLeft_toRightOf="@id/ivCurrencyIcon" />
+
+    <TextView
+        android:id="@+id/tvCurrencySymbol"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/general_margin"
+        android:textColor="@color/grey"
+        android:textSize="14sp"
         tools:text="USD"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="@id/ivCurrencyIcon"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/vGuideline"
+        app:layout_constraintStart_toEndOf="@id/ivCurrencyIcon" />
 
     <EditText
         android:id="@+id/etRate"
