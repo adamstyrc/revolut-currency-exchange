@@ -20,6 +20,17 @@
     <string name="currency_ils">Israeli New Shekel</string>
     <string name="currency_inr">Indian Rupee</string>
     <string name="currency_isk">Icelandic Króna</string>
-    <string name="currency_krw">Sounth Korean Won</string>
+    <string name="currency_krw">South Korean Won</string>
     <string name="currency_mxn">Mexican Peso</string>
+    <string name="currency_bgn">Bulgarian Lev</string>
+    <string name="currency_brl">Brazilian Real</string>
+    <string name="currency_nok">Norwegian Krone</string>
+    <string name="currency_myr">Malaysian Ringgit</string>
+    <string name="currency_nzd">New Zealand Dollar</string>
+    <string name="currency_php">Philippine Piso</string>
+    <string name="currency_ron">Romanian Leu</string>
+    <string name="currency_sgd">Singapore Dollar</string>
+    <string name="currency_thb">Thai Baht</string>
+    <string name="currency_try">Turkish Lira</string>
+    <string name="currency_zar">South African Rand</string>
 </resources>
