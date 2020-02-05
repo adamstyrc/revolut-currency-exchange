@@ -6,7 +6,7 @@ apply plugin: 'kotlin-kapt'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.adamstyrc.currencyrateconverter"
+        applicationId "com.revolut.currencycalculator"
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
