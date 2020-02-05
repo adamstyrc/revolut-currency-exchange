@@ -13,12 +13,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.revolut.currencycalculator.R
 import com.revolut.currencycalculator.model.CurrencyIcons
 import com.revolut.currencycalculator.ui.activity.MainActivity
+import com.revolut.currencycalculator.utils.Logger
+import com.revolut.domain.Money
+import com.revolut.domain.model.Currency
 import com.revolut.domain.model.EstimatedCurrencyExchange
 
 class CurrenciesExchangeAdapter(
     val context: Context,
     var items: MutableList<EstimatedCurrencyExchange>
 ) : RecyclerView.Adapter<CurrenciesExchangeAdapter.ViewHolder>() {
+
+    var onBaseCurrencyAmountChanged: OnBaseCurrencyChanged? = null
 
     private val textChangedListener = object : TextWatcher {
         override fun afterTextChanged(s: Editable?) {}
@@ -44,10 +49,8 @@ class CurrenciesExchangeAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val currencyRate = items[position]
-        holder.bindCurrencyRate(currencyRate, position == 0)
+        holder.bindCurrencyRate(position, currencyRate)
     }
-
-
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var ivCurrencyIcon: ImageView = itemView.findViewById(R.id.ivCurrencyIcon)
@@ -55,8 +58,8 @@ class CurrenciesExchangeAdapter(
         var etRateConverter: EditText = itemView.findViewById(R.id.etRate)
 
         fun bindCurrencyRate(
-            estimatedCurrencyExchange: EstimatedCurrencyExchange,
-            selectedAsBaseCurrency: Boolean
+            position: Int,
+            estimatedCurrencyExchange: EstimatedCurrencyExchange
         ) {
             val icon = CurrencyIcons.getIcon(estimatedCurrencyExchange.currency)
             ivCurrencyIcon.setImageResource(icon)
@@ -69,41 +72,34 @@ class CurrenciesExchangeAdapter(
             etRateConverter.removeTextChangedListener(textChangedListener)
             etRateConverter.setText(formattedValue)
 
-            setViewActions(estimatedCurrencyExchange, selectedAsBaseCurrency)
+            setViewActions(position, estimatedCurrencyExchange)
         }
 
         private fun setViewActions(
-            estimatedCurrencyExchange: EstimatedCurrencyExchange,
-            selectedAsBase: Boolean
+            position: Int,
+            estimatedCurrencyExchange: EstimatedCurrencyExchange
         ) {
-            if (selectedAsBase) {
-                enableEditText(true)
+            if (position == 0) {
+                etRateConverter.onFocusChangeListener = null
                 etRateConverter.addTextChangedListener(textChangedListener)
-                etRateConverter.setOnClickListener(null)
             } else {
-                enableEditText(true)
                 etRateConverter.setOnFocusChangeListener { _, hasFocus ->
                     if (hasFocus) {
-                        onFocusIntercepted(estimatedCurrencyExchange, context)
+                        Logger.log("Position $position focus $hasFocus")
+                        onFocusIntercepted(position, estimatedCurrencyExchange)
                     }
                 }
             }
         }
 
-        private fun enableEditText(enabled: Boolean) {
-            etRateConverter.isFocusable = enabled
-        }
-
         private fun onFocusIntercepted(
-            estimatedCurrencyExchange: EstimatedCurrencyExchange,
-            context: Context
+            position: Int,
+            estimatedCurrencyExchange: EstimatedCurrencyExchange
         ) {
             etRateConverter.removeTextChangedListener(textChangedListener)
-            if (context is MainActivity) {
-                moveItemToTop()
-                setViewActions(estimatedCurrencyExchange, true)
-                context.setBaseCurrency(estimatedCurrencyExchange.currency)
-            }
+            moveItemToTop()
+            setViewActions(position, estimatedCurrencyExchange)
+            onBaseCurrencyAmountChanged?.onBaseCurrencyChanged(estimatedCurrencyExchange.currency)
         }
 
         private fun moveItemToTop() {
@@ -114,6 +110,11 @@ class CurrenciesExchangeAdapter(
                 notifyItemMoved(currentPosition, 0)
             }
         }
+    }
+
+    interface OnBaseCurrencyChanged {
+        fun onBaseCurrencyAmountChanged(amount: Money)
+        fun onBaseCurrencyChanged(currency: Currency)
     }
 }
 

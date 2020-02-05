@@ -24,6 +24,16 @@ class MainActivity : AppCompatActivity() {
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: CurrencyRateViewModel
     private var currenciesRateAdapter = CurrenciesExchangeAdapter(this, ArrayList())
+    private val onBaseCurrencyAmountChanged =
+        object : CurrenciesExchangeAdapter.OnBaseCurrencyChanged {
+            override fun onBaseCurrencyChanged(currency: Currency) {
+                setBaseCurrency(currency)
+            }
+
+            override fun onBaseCurrencyAmountChanged(amount: Money) {
+                setBaseCurrencyAmount(amount)
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,12 +44,13 @@ class MainActivity : AppCompatActivity() {
             .get(CurrencyRateViewModel::class.java)
 
         rvCurrencyRates.layoutManager = LinearLayoutManager(this)
+
         rvCurrencyRates.adapter = currenciesRateAdapter
+        currenciesRateAdapter.onBaseCurrencyAmountChanged = onBaseCurrencyAmountChanged
         (rvCurrencyRates.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         viewModel.getEstimatedCurrencyExchange().observe(this, Observer { currencyRates ->
             updateExchangedCurrencies(currencyRates)
-
         })
     }
 
@@ -68,6 +79,7 @@ class MainActivity : AppCompatActivity() {
 
         currenciesRateAdapter.notifyItemRangeChanged(
             1,
-            currenciesRateAdapter.itemCount - 1)
+            currenciesRateAdapter.itemCount - 1
+        )
     }
 }
