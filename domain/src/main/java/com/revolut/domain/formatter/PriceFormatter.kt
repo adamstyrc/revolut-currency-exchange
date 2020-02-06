@@ -1,7 +1,6 @@
 package com.revolut.domain.formatter
 
 import com.revolut.domain.Price
-import java.math.BigDecimal
 
 object PriceFormatter {
 
@@ -22,6 +21,5 @@ object PriceFormatter {
         } else {
             return displayPriceWith2Decimals(price)
         }
-
     }
 }
