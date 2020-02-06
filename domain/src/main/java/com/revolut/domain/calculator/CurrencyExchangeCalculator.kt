@@ -1,15 +1,15 @@
 package com.revolut.domain.calculator
 
-import com.revolut.domain.Money
+import com.revolut.domain.Price
 import com.revolut.domain.model.Currency
 import com.revolut.domain.model.EstimatedCurrencyExchange
 
 class CurrencyExchangeCalculator {
 
     fun calculate(
-        currencyRatesData: Map<Currency, Money>,
+        currencyRatesData: Map<Currency, Price>,
         wantedCurrency: Currency,
-        exchangedValue: Money
+        exchangedValue: Price
     ) : EstimatedCurrencyExchange? {
         val exchangeRate = currencyRatesData[wantedCurrency]
 

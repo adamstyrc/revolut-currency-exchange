@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.revolut.currencycalculator.api.RevolutApi
-import com.revolut.domain.Money
+import com.revolut.domain.Price
 import com.revolut.domain.calculator.CurrencyExchangeCalculator
 import com.revolut.domain.model.Currency
 import com.revolut.domain.model.CurrencyValuation
@@ -69,7 +69,7 @@ class CurrencyRateViewModel @Inject constructor(
         disposable.dispose()
     }
 
-    fun setBaseCurrencyAmount(amount: Money) {
+    fun setBaseCurrencyAmount(amount: Price) {
         baseCurrencyAmount = amount
         updateExchangedCurrencies()
     }

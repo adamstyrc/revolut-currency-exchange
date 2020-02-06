@@ -1,6 +1,5 @@
 package com.revolut.currencycalculator.ui.adapter
 
-import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -12,18 +11,17 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.revolut.currencycalculator.R
 import com.revolut.currencycalculator.model.CurrenciesInfo
-import com.revolut.currencycalculator.ui.activity.MainActivity
 import com.revolut.currencycalculator.utils.Logger
-import com.revolut.domain.Money
+import com.revolut.domain.Price
+import com.revolut.domain.formatter.PriceFormatter
 import com.revolut.domain.model.Currency
 import com.revolut.domain.model.EstimatedCurrencyExchange
 
-class CurrenciesExchangeAdapter(
-    val context: Context,
+class CurrenciesCalculatorAdapter(
     var items: MutableList<EstimatedCurrencyExchange>
-) : RecyclerView.Adapter<CurrenciesExchangeAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<CurrenciesCalculatorAdapter.ViewHolder>() {
 
-    var onBaseCurrencyAmountChanged: OnBaseCurrencyChanged? = null
+    var onBaseCurrencyChanged: OnBaseCurrencyChanged? = null
 
     private val textChangedListener = object : TextWatcher {
         override fun afterTextChanged(s: Editable?) {}
@@ -32,9 +30,8 @@ class CurrenciesExchangeAdapter(
 
         override fun onTextChanged(input: CharSequence?, start: Int, before: Int, count: Int) {
             input.toString().toBigDecimalOrNull()?.let { amount ->
-                if (context is MainActivity) {
-                    context.setBaseCurrencyAmount(amount)
-                }
+                Logger.log("onBaseCurrencyAmountChanged(${amount})")
+                onBaseCurrencyChanged?.onBaseCurrencyAmountChanged(amount)
             }
         }
     }
@@ -52,6 +49,12 @@ class CurrenciesExchangeAdapter(
         holder.bindCurrencyRate(position, currencyRate)
     }
 
+
+    fun updateItems(currencyExchangeRates: MutableList<EstimatedCurrencyExchange>) {
+        items = currencyExchangeRates
+        notifyItemRangeChanged(1, itemCount - 1)
+    }
+
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private var ivCurrencyIcon: ImageView = itemView.findViewById(R.id.ivCurrencyIcon)
         private var tvCurrencyName: TextView = itemView.findViewById(R.id.tvCurrencyName)
@@ -65,13 +68,15 @@ class CurrenciesExchangeAdapter(
             setCurrency(estimatedCurrencyExchange.currency)
 
             //TODO decide about rounding to 2 last digits
-            val formattedValue = "%.2f".format(estimatedCurrencyExchange.value)
-                .replace(",", ".")
+            val price = estimatedCurrencyExchange.value
+            val formattedValue = PriceFormatter.displayPriceUpTo2Decimals(price)
 
             etRateConverter.removeTextChangedListener(textChangedListener)
+
             etRateConverter.setText(formattedValue)
 
-            setViewActions(position, estimatedCurrencyExchange)
+            val isBaseCurrency = position == 0
+            setItemBehavior(position, isBaseCurrency, estimatedCurrencyExchange)
         }
 
         private fun setCurrency(currency: Currency) {
@@ -88,11 +93,12 @@ class CurrenciesExchangeAdapter(
             tvCurrencySymbol.text = currency.name
         }
 
-        private fun setViewActions(
+        private fun setItemBehavior(
             position: Int,
+            isBaseCurrency: Boolean,
             estimatedCurrencyExchange: EstimatedCurrencyExchange
         ) {
-            if (position == 0) {
+            if (isBaseCurrency) {
                 etRateConverter.onFocusChangeListener = null
                 etRateConverter.addTextChangedListener(textChangedListener)
             } else {
@@ -102,6 +108,7 @@ class CurrenciesExchangeAdapter(
                         onFocusIntercepted(position, estimatedCurrencyExchange)
                     }
                 }
+                etRateConverter.removeTextChangedListener(textChangedListener)
             }
         }
 
@@ -111,8 +118,10 @@ class CurrenciesExchangeAdapter(
         ) {
             etRateConverter.removeTextChangedListener(textChangedListener)
             moveItemToTop()
-            setViewActions(position, estimatedCurrencyExchange)
-            onBaseCurrencyAmountChanged?.onBaseCurrencyChanged(estimatedCurrencyExchange.currency)
+            setItemBehavior(position, true, estimatedCurrencyExchange)
+
+            Logger.log("onBaseCurrencyChanged(${estimatedCurrencyExchange.currency})")
+            onBaseCurrencyChanged?.onBaseCurrencyChanged(estimatedCurrencyExchange.currency)
         }
 
         private fun moveItemToTop() {
@@ -121,12 +130,13 @@ class CurrenciesExchangeAdapter(
                     items.add(0, it)
                 }
                 notifyItemMoved(currentPosition, 0)
+                notifyItemChanged(1)
             }
         }
     }
 
     interface OnBaseCurrencyChanged {
-        fun onBaseCurrencyAmountChanged(amount: Money)
+        fun onBaseCurrencyAmountChanged(amount: Price)
         fun onBaseCurrencyChanged(currency: Currency)
     }
 }

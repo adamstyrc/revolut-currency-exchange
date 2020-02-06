@@ -9,9 +9,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.revolut.currencycalculator.R
 import com.revolut.currencycalculator.dagger.InjectionGraph
-import com.revolut.currencycalculator.ui.adapter.CurrenciesExchangeAdapter
+import com.revolut.currencycalculator.ui.adapter.CurrenciesCalculatorAdapter
+import com.revolut.currencycalculator.utils.Logger
 import com.revolut.currencycalculator.viewmodel.CurrencyRateViewModel
-import com.revolut.domain.Money
+import com.revolut.domain.Price
 import com.revolut.domain.model.Currency
 import com.revolut.domain.model.EstimatedCurrencyExchange
 import kotlinx.android.synthetic.main.activity_main.*
@@ -23,14 +24,14 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: CurrencyRateViewModel
-    private var currenciesRateAdapter = CurrenciesExchangeAdapter(this, ArrayList())
-    private val onBaseCurrencyAmountChanged =
-        object : CurrenciesExchangeAdapter.OnBaseCurrencyChanged {
+    private var currenciesCalculatorAdapter = CurrenciesCalculatorAdapter(ArrayList())
+    private val onBaseCurrencyChanged =
+        object : CurrenciesCalculatorAdapter.OnBaseCurrencyChanged {
             override fun onBaseCurrencyChanged(currency: Currency) {
                 setBaseCurrency(currency)
             }
 
-            override fun onBaseCurrencyAmountChanged(amount: Money) {
+            override fun onBaseCurrencyAmountChanged(amount: Price) {
                 setBaseCurrencyAmount(amount)
             }
         }
@@ -45,11 +46,12 @@ class MainActivity : AppCompatActivity() {
 
         rvCurrencyRates.layoutManager = LinearLayoutManager(this)
 
-        rvCurrencyRates.adapter = currenciesRateAdapter
-        currenciesRateAdapter.onBaseCurrencyAmountChanged = onBaseCurrencyAmountChanged
+        rvCurrencyRates.adapter = currenciesCalculatorAdapter
+        currenciesCalculatorAdapter.onBaseCurrencyChanged = onBaseCurrencyChanged
         (rvCurrencyRates.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         viewModel.getEstimatedCurrencyExchange().observe(this, Observer { currencyRates ->
+            Logger.log(currencyRates.toString())
             updateExchangedCurrencies(currencyRates)
         })
     }
@@ -64,7 +66,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.cancelUpdatingCurrencyRates()
     }
 
-    fun setBaseCurrencyAmount(amount: Money) {
+    fun setBaseCurrencyAmount(amount: Price) {
         viewModel.setBaseCurrencyAmount(amount)
     }
 
@@ -75,11 +77,6 @@ class MainActivity : AppCompatActivity() {
     private fun updateExchangedCurrencies(
         currencyExchangeRates: MutableList<EstimatedCurrencyExchange>
     ) {
-        currenciesRateAdapter.items = currencyExchangeRates
-
-        currenciesRateAdapter.notifyItemRangeChanged(
-            1,
-            currenciesRateAdapter.itemCount - 1
-        )
+        currenciesCalculatorAdapter.updateItems(currencyExchangeRates)
     }
 }

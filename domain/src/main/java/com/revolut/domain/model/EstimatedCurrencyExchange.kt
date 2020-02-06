@@ -1,9 +1,9 @@
 package com.revolut.domain.model
 
-import com.revolut.domain.Money
+import com.revolut.domain.Price
 import java.math.BigDecimal
 
-class EstimatedCurrencyExchange(
+data class EstimatedCurrencyExchange(
     var currency: Currency,
-    var value: Money = BigDecimal.ZERO
+    var value: Price = BigDecimal.ZERO
 )

@@ -1,7 +1,6 @@
 package com.revolut.domain.calculator
 
 import com.google.common.truth.Truth.assertThat
-import com.revolut.domain.Money
 import com.revolut.domain.model.Currency
 import org.junit.Test
 import java.math.BigDecimal
