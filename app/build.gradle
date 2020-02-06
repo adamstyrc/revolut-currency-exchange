@@ -27,5 +27,4 @@ android {
 
 dependencies {
     implementation project(':core')
-//    implementation deps.kotlin_std_lib
 }
