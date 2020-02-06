@@ -35,10 +35,10 @@ object CurrenciesInfo {
         Currency.PHP to CurrencyInfo(R.drawable.ic_php, R.string.currency_php),
         Currency.RON to CurrencyInfo(R.drawable.ic_ron, R.string.currency_ron),
         Currency.SEK to CurrencyInfo(R.drawable.ic_sek, R.string.currency_sek),
-        Currency.SGD to CurrencyInfo(R.drawable.ic_currency_unknown, R.string.currency_sgd),
-        Currency.THB to CurrencyInfo(R.drawable.ic_currency_unknown, R.string.currency_thb),
-        Currency.TRY to CurrencyInfo(R.drawable.ic_currency_unknown, R.string.currency_try),
-        Currency.ZAR to CurrencyInfo(R.drawable.ic_currency_unknown, R.string.currency_zar)
+        Currency.SGD to CurrencyInfo(R.drawable.ic_sgd, R.string.currency_sgd),
+        Currency.THB to CurrencyInfo(R.drawable.ic_thb, R.string.currency_thb),
+        Currency.TRY to CurrencyInfo(R.drawable.ic_try, R.string.currency_try),
+        Currency.ZAR to CurrencyInfo(R.drawable.ic_zar, R.string.currency_zar)
     )
 
     fun getIcon(currency: Currency): Int?
