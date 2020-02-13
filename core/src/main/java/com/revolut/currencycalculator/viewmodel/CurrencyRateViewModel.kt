@@ -33,17 +33,19 @@ class CurrencyRateViewModel @Inject constructor(
 
     private val currencyValuationLiveData =
         localCurrencyValuationRepository.getCurrencyValuation()
-    private val currencyValuationObserver = Observer<CurrencyValuation> { currencyValuation ->
-        recalculateCurrenciesPrices(currencyValuation)
+    private val currencyValuationObserver = Observer<CurrencyValuation?> { currencyValuation ->
+        if (currencyValuation != null) {
+            recalculateCurrenciesPrices(currencyValuation)
+        }
     }
+    private val calculatedCurrenciesPricesList = MutableLiveData<List<CalculatedCurrencyPrice>>()
+    private var disposable = Disposables.disposed()
+
 
     init {
         currencyValuationLiveData.observeForever(currencyValuationObserver)
     }
 
-    private val calculatedCurrenciesPricesList = MutableLiveData<List<CalculatedCurrencyPrice>>()
-
-    private var disposable = Disposables.disposed()
 
     override fun onCleared() {
         super.onCleared()

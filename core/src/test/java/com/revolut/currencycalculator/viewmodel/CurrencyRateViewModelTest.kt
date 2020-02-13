@@ -2,8 +2,8 @@ package com.revolut.currencycalculator.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.revolut.currencycalculator.api.RevolutApi
+import com.revolut.domain.CurrencyValuationTestData
 import com.revolut.domain.model.Currency
-import com.revolut.domain.model.CurrencyValuation
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertTrue
 import org.junit.Before
@@ -22,24 +22,12 @@ class CurrencyRateViewModelTest {
     private var api = mock(RevolutApi::class.java)
     private lateinit var viewModel: CurrencyRateViewModel
 
+    private val currencyValuationTestData = CurrencyValuationTestData()
+
     private val orderedCurrencies = arrayListOf(
         Currency.EUR,
         Currency.USD,
         Currency.PLN
-    )
-    private val valuationEUR = CurrencyValuation(
-        base = Currency.EUR,
-        rates = hashMapOf(
-            Pair(Currency.USD, BigDecimal.valueOf(1.1652)),
-            Pair(Currency.PLN, BigDecimal.valueOf(4.3248))
-        )
-    )
-    private val valuationUSD = CurrencyValuation(
-        base = Currency.USD,
-        rates = hashMapOf(
-            Pair(Currency.EUR, BigDecimal.valueOf(0.85646)),
-            Pair(Currency.PLN, BigDecimal.valueOf(3.6984))
-        )
     )
 
     @Before
@@ -51,8 +39,6 @@ class CurrencyRateViewModelTest {
 
         viewModel = CurrencyRateViewModel(api)
         viewModel.setDemandedCurrencies(orderedCurrencies)
-        viewModel.setLatestCurrencyValuation(valuationEUR)
-        viewModel.recalculateCurrenciesPrices()
     }
 
     @Test

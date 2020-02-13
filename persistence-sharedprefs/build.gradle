@@ -8,6 +8,8 @@ dependencies {
     api project(":domain")
     api project(":core-ports-android")
 
+    implementation deps.gson
+
     compileOnly deps.androidx_lifecycle_livedata
     compileOnly deps.androidx_lifecycle_extensions
 

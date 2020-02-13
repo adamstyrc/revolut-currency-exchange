@@ -24,6 +24,8 @@ class RevolutModule(context: Context) {
 
     @Provides
     @Singleton
-    fun provideLocalCurrencyValuationRepository(): LocalCurrencyValuationRepository =
-        SharedPrefsLocalCurrencyValuationRepository()
+    fun provideLocalCurrencyValuationRepository(
+        context: Context
+    ): LocalCurrencyValuationRepository =
+        SharedPrefsLocalCurrencyValuationRepository(context)
 }
