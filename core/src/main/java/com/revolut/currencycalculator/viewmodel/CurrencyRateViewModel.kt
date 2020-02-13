@@ -1,15 +1,16 @@
 package com.revolut.currencycalculator.viewmodel
 
-import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.revolut.currencycalculator.api.RevolutApi
 import com.revolut.domain.Price
 import com.revolut.domain.calculator.CurrencyExchangeCalculator
 import com.revolut.domain.model.Currency
 import com.revolut.domain.model.CurrencyValuation
-import com.revolut.domain.model.EstimatedCurrencyExchange
+import com.revolut.domain.model.CalculatedCurrencyPrice
+import com.revolut.domain.transformation.CurrencyValuationTransformations
+import com.revolut.ports.LocalCurrencyValuationRepository
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposables
 import io.reactivex.rxkotlin.subscribeBy
@@ -18,7 +19,8 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class CurrencyRateViewModel @Inject constructor(
-    private val api: RevolutApi
+    private val api: RevolutApi,
+    private val localCurrencyValuationRepository: LocalCurrencyValuationRepository
 ) : ViewModel() {
 
     companion object {
@@ -26,22 +28,32 @@ class CurrencyRateViewModel @Inject constructor(
     }
 
     private var demandedCurrencies: MutableList<Currency> = ArrayList(Currency.values().toList())
-    private var latestCurrencyValuation: CurrencyValuation? = null
     private var baseCurrencyAmount = BigDecimal(100.00)
     private var currencyExchangeCalculator = CurrencyExchangeCalculator()
 
-    private val estimatedCurrenciesExchange =
-        MutableLiveData<MutableList<EstimatedCurrencyExchange>>(arrayListOf())
+    private val currencyValuationLiveData =
+        localCurrencyValuationRepository.getCurrencyValuation()
+    private val currencyValuationObserver = Observer<CurrencyValuation> { currencyValuation ->
+        recalculateCurrenciesPrices(currencyValuation)
+    }
+
+    init {
+        currencyValuationLiveData.observeForever(currencyValuationObserver)
+    }
+
+    private val calculatedCurrenciesPricesList = MutableLiveData<List<CalculatedCurrencyPrice>>()
+
     private var disposable = Disposables.disposed()
 
     override fun onCleared() {
         super.onCleared()
 
         disposable.dispose()
+
+        currencyValuationLiveData
+            .removeObserver(currencyValuationObserver)
     }
 
-    fun getEstimatedCurrencyExchange(): LiveData<MutableList<EstimatedCurrencyExchange>> =
-        estimatedCurrenciesExchange
 
     fun setDemandedCurrencies(currencies: List<Currency>) {
         demandedCurrencies = ArrayList(currencies)
@@ -59,10 +71,12 @@ class CurrencyRateViewModel @Inject constructor(
             .retry()
             .subscribeBy(
                 onNext = { currencyRateData ->
-                    latestCurrencyValuation = currencyRateData
-                    updateExchangedCurrencies()
+                    localCurrencyValuationRepository.saveCurrencyValuation(currencyRateData)
+//                    recalculateCurrenciesPrices()
                 },
-                onError = {})
+                onError = {
+                    it.printStackTrace()
+                })
     }
 
     fun cancelUpdatingCurrencyRates() {
@@ -71,7 +85,9 @@ class CurrencyRateViewModel @Inject constructor(
 
     fun setBaseCurrencyAmount(amount: Price) {
         baseCurrencyAmount = amount
-        updateExchangedCurrencies()
+        currencyValuationLiveData.value?.let { currencyValuation ->
+            recalculateCurrenciesPrices(currencyValuation)
+        }
     }
 
     fun setBaseCurrency(currency: Currency) {
@@ -79,61 +95,60 @@ class CurrencyRateViewModel @Inject constructor(
         demandedCurrencies.remove(currency)
         demandedCurrencies.add(0, currency)
 
-        baseCurrencyAmount = estimatedCurrenciesExchange.value
-            ?.find { it.currency == currency }
-            ?.value!!
+        calculatedCurrenciesPricesList.value?.let { calculatedCurrenciesPrices ->
+            baseCurrencyAmount =
+                calculatedCurrenciesPrices.find { it.currency == currency }!!.value
+        }
 
         startUpdatingCurrencyRates()
     }
 
-    fun updateExchangedCurrencies() {
-        val currencyRates = latestCurrencyValuation
-        if (currencyRates == null
-            || currencyRates.base != getBaseCurrency()
-        ) {
-            orderEstimatedCurrenciesExchange()
-            return
-        }
+    fun getCalculatedCurrencyExchange() =
+        calculatedCurrenciesPricesList
 
-        val latestExchangedByBaseCurrencies =
-            demandedCurrencies.map { currency ->
-                if (currency == demandedCurrencies[0]) {
-                    return@map EstimatedCurrencyExchange(currency, baseCurrencyAmount)
-                }
+    private fun recalculateCurrenciesPrices(currencyValuation: CurrencyValuation) {
+        val recalculatedCurrenciesPrices = calculateCurrenciesPrices(
+            getBaseCurrency(),
+            baseCurrencyAmount,
+            currencyValuation
+        )
 
-                currencyExchangeCalculator.calculate(
-                    currencyRates.rates,
-                    currency,
-                    baseCurrencyAmount
-                )?.let { estimatedCurrenciesExchange ->
-                    return@map estimatedCurrenciesExchange
-                }
-
-                return
-            }
-
-        estimatedCurrenciesExchange.postValue(ArrayList(latestExchangedByBaseCurrencies))
-    }
-
-    @VisibleForTesting
-    fun setLatestCurrencyValuation(currencyValuation: CurrencyValuation?) {
-        latestCurrencyValuation = currencyValuation
-    }
-
-    private fun orderEstimatedCurrenciesExchange() {
-        val estimatedCurrenciesExchangeList =
-            estimatedCurrenciesExchange.value
-        if (estimatedCurrenciesExchangeList != null
-            && estimatedCurrenciesExchangeList.isNotEmpty()
-        ) {
-            val orderedEstimatedCurrenciesExchangeList =
-                demandedCurrencies.map { currency ->
-                    estimatedCurrenciesExchangeList.find { it.currency == currency }!!
-                }
-            estimatedCurrenciesExchange.postValue(ArrayList(orderedEstimatedCurrenciesExchangeList))
-        }
+        calculatedCurrenciesPricesList.postValue(recalculatedCurrenciesPrices)
     }
 
     private fun getBaseCurrency() = demandedCurrencies[0]
 
+    private fun calculateCurrenciesPrices(
+        soldCurrency: Currency,
+        soldCurrencyAmount: Price,
+        latestCurrencyValuation: CurrencyValuation?
+    ): List<CalculatedCurrencyPrice> {
+        if (latestCurrencyValuation == null) {
+            return emptyList()
+        }
+
+        val currencyValuation: CurrencyValuation =
+            (if (soldCurrency == latestCurrencyValuation.base)
+                latestCurrencyValuation
+            else
+                CurrencyValuationTransformations.transformCurrencyValuationForNewCurrency(
+                    latestCurrencyValuation,
+                    soldCurrency
+                ))
+                ?: return emptyList()
+
+        return demandedCurrencies.map { currency ->
+            val calculatedPrice =
+                currencyExchangeCalculator.calculateBoughtCurrencyValue(
+                    soldCurrency,
+                    soldCurrencyAmount,
+                    currency,
+                    currencyValuation
+                )
+
+            CalculatedCurrencyPrice(
+                currency = currency,
+                value = calculatedPrice ?: Price.valueOf(0))
+        }
+    }
 }

@@ -2,6 +2,8 @@ package com.revolut.currencycalculator.dagger
 
 import android.content.Context
 import com.revolut.currencycalculator.api.RevolutWebService
+import com.revolut.persistence_sharedprefs.SharedPrefsLocalCurrencyValuationRepository
+import com.revolut.ports.LocalCurrencyValuationRepository
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -20,4 +22,8 @@ class RevolutModule(context: Context) {
     @Singleton
     fun provideRevolutApi() = RevolutWebService(applicationContext).api
 
+    @Provides
+    @Singleton
+    fun provideLocalCurrencyValuationRepository(): LocalCurrencyValuationRepository =
+        SharedPrefsLocalCurrencyValuationRepository()
 }

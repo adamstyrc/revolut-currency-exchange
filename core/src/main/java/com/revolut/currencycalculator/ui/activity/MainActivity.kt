@@ -14,7 +14,7 @@ import com.revolut.currencycalculator.utils.Logger
 import com.revolut.currencycalculator.viewmodel.CurrencyRateViewModel
 import com.revolut.domain.Price
 import com.revolut.domain.model.Currency
-import com.revolut.domain.model.EstimatedCurrencyExchange
+import com.revolut.domain.model.CalculatedCurrencyPrice
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
         currenciesCalculatorAdapter.onBaseCurrencyChanged = onBaseCurrencyChanged
         (rvCurrencyRates.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
-        viewModel.getEstimatedCurrencyExchange().observe(this, Observer { currencyRates ->
+        viewModel.getCalculatedCurrencyExchange().observe(this, Observer { currencyRates ->
             Logger.log(currencyRates.toString())
             updateExchangedCurrencies(currencyRates)
         })
@@ -75,8 +75,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateExchangedCurrencies(
-        currencyExchangeRates: MutableList<EstimatedCurrencyExchange>
+        currencyPriceRates: List<CalculatedCurrencyPrice>
     ) {
-        currenciesCalculatorAdapter.updateItems(currencyExchangeRates)
+        currenciesCalculatorAdapter.updateItems(currencyPriceRates)
     }
 }

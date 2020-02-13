@@ -1,0 +1,13 @@
+apply plugin: 'java-library'
+apply plugin: 'kotlin'
+
+dependencies {
+    implementation deps.kotlin_std_lib
+
+    testImplementation deps.junit
+    testImplementation deps.mockito
+    testImplementation deps.google_truth
+}
+
+sourceCompatibility = "7"
+targetCompatibility = "7"

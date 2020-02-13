@@ -15,10 +15,10 @@ import com.revolut.currencycalculator.utils.Logger
 import com.revolut.domain.Price
 import com.revolut.domain.formatter.PriceFormatter
 import com.revolut.domain.model.Currency
-import com.revolut.domain.model.EstimatedCurrencyExchange
+import com.revolut.domain.model.CalculatedCurrencyPrice
 
 class CurrenciesCalculatorAdapter(
-    var items: MutableList<EstimatedCurrencyExchange>
+    var items: MutableList<CalculatedCurrencyPrice>
 ) : RecyclerView.Adapter<CurrenciesCalculatorAdapter.ViewHolder>() {
 
     var onBaseCurrencyChanged: OnBaseCurrencyChanged? = null
@@ -50,8 +50,8 @@ class CurrenciesCalculatorAdapter(
     }
 
 
-    fun updateItems(currencyExchangeRates: MutableList<EstimatedCurrencyExchange>) {
-        items = currencyExchangeRates
+    fun updateItems(currencyPriceRates: List<CalculatedCurrencyPrice>) {
+        items = currencyPriceRates.toMutableList()
         notifyItemRangeChanged(1, itemCount - 1)
     }
 
@@ -63,12 +63,12 @@ class CurrenciesCalculatorAdapter(
 
         fun bindCurrencyRate(
             position: Int,
-            estimatedCurrencyExchange: EstimatedCurrencyExchange
+            calculatedCurrencyPrice: CalculatedCurrencyPrice
         ) {
-            setCurrency(estimatedCurrencyExchange.currency)
+            setCurrency(calculatedCurrencyPrice.currency)
 
             //TODO decide about rounding to 2 last digits
-            val price = estimatedCurrencyExchange.value
+            val price = calculatedCurrencyPrice.value
             val formattedValue = PriceFormatter.displayPriceUpTo2Decimals(price)
 
             etRateConverter.removeTextChangedListener(textChangedListener)
@@ -76,7 +76,7 @@ class CurrenciesCalculatorAdapter(
             etRateConverter.setText(formattedValue)
 
             val isBaseCurrency = position == 0
-            setItemBehavior(position, isBaseCurrency, estimatedCurrencyExchange)
+            setItemBehavior(position, isBaseCurrency, calculatedCurrencyPrice)
         }
 
         private fun setCurrency(currency: Currency) {
@@ -96,7 +96,7 @@ class CurrenciesCalculatorAdapter(
         private fun setItemBehavior(
             position: Int,
             isBaseCurrency: Boolean,
-            estimatedCurrencyExchange: EstimatedCurrencyExchange
+            calculatedCurrencyPrice: CalculatedCurrencyPrice
         ) {
             if (isBaseCurrency) {
                 etRateConverter.onFocusChangeListener = null
@@ -105,7 +105,7 @@ class CurrenciesCalculatorAdapter(
                 etRateConverter.setOnFocusChangeListener { _, hasFocus ->
                     if (hasFocus) {
                         Logger.log("Position $position focus $hasFocus")
-                        onFocusIntercepted(position, estimatedCurrencyExchange)
+                        onFocusIntercepted(position, calculatedCurrencyPrice)
                     }
                 }
                 etRateConverter.removeTextChangedListener(textChangedListener)
@@ -114,14 +114,14 @@ class CurrenciesCalculatorAdapter(
 
         private fun onFocusIntercepted(
             position: Int,
-            estimatedCurrencyExchange: EstimatedCurrencyExchange
+            calculatedCurrencyPrice: CalculatedCurrencyPrice
         ) {
             etRateConverter.removeTextChangedListener(textChangedListener)
             moveItemToTop()
-            setItemBehavior(position, true, estimatedCurrencyExchange)
+            setItemBehavior(position, true, calculatedCurrencyPrice)
 
-            Logger.log("onBaseCurrencyChanged(${estimatedCurrencyExchange.currency})")
-            onBaseCurrencyChanged?.onBaseCurrencyChanged(estimatedCurrencyExchange.currency)
+            Logger.log("onBaseCurrencyChanged(${calculatedCurrencyPrice.currency})")
+            onBaseCurrencyChanged?.onBaseCurrencyChanged(calculatedCurrencyPrice.currency)
         }
 
         private fun moveItemToTop() {

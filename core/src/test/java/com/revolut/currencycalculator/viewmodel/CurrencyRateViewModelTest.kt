@@ -52,12 +52,12 @@ class CurrencyRateViewModelTest {
         viewModel = CurrencyRateViewModel(api)
         viewModel.setDemandedCurrencies(orderedCurrencies)
         viewModel.setLatestCurrencyValuation(valuationEUR)
-        viewModel.updateExchangedCurrencies()
+        viewModel.recalculateCurrenciesPrices()
     }
 
     @Test
     fun `base currency is set to EUR`() {
-        viewModel.getEstimatedCurrencyExchange().observeForever { estimatedCurrenciesExchange ->
+        viewModel.getCalculatedCurrencyExchange().observeForever { estimatedCurrenciesExchange ->
             assertEquals(3, estimatedCurrenciesExchange?.size)
 
             assertEquals(Currency.EUR, estimatedCurrenciesExchange?.get(0)?.currency)
@@ -86,9 +86,9 @@ class CurrencyRateViewModelTest {
 
         viewModel.setBaseCurrency(Currency.USD)
         viewModel.setLatestCurrencyValuation(valuationUSD)
-        viewModel.updateExchangedCurrencies()
+        viewModel.recalculateCurrenciesPrices()
 
-        viewModel.getEstimatedCurrencyExchange().observeForever { estimatedCurrenciesExchange ->
+        viewModel.getCalculatedCurrencyExchange().observeForever { estimatedCurrenciesExchange ->
             assertEquals(3, estimatedCurrenciesExchange?.size)
 
             assertEquals(Currency.USD, estimatedCurrenciesExchange?.get(0)?.currency)
@@ -116,9 +116,9 @@ class CurrencyRateViewModelTest {
         val expectedNewBaseAmount = BigDecimal.valueOf(432.48)
 
         viewModel.setBaseCurrency(Currency.PLN)
-        viewModel.updateExchangedCurrencies()
+        viewModel.recalculateCurrenciesPrices()
 
-        viewModel.getEstimatedCurrencyExchange().observeForever { estimatedCurrenciesExchange ->
+        viewModel.getCalculatedCurrencyExchange().observeForever { estimatedCurrenciesExchange ->
             assertEquals(3, estimatedCurrenciesExchange?.size)
 
             assertEquals(Currency.PLN, estimatedCurrenciesExchange?.get(0)?.currency)
@@ -144,9 +144,9 @@ class CurrencyRateViewModelTest {
     @Test
     fun `set amount to 0`() {
         viewModel.setBaseCurrencyAmount(BigDecimal.ZERO)
-        viewModel.updateExchangedCurrencies()
+        viewModel.recalculateCurrenciesPrices()
 
-        viewModel.getEstimatedCurrencyExchange().observeForever { estimatedCurrenciesExchange ->
+        viewModel.getCalculatedCurrencyExchange().observeForever { estimatedCurrenciesExchange ->
             assertEquals(3, estimatedCurrenciesExchange?.size)
 
             assertEquals(Currency.EUR, estimatedCurrenciesExchange?.get(0)?.currency)
@@ -172,9 +172,9 @@ class CurrencyRateViewModelTest {
     @Test
     fun `set amount to 999,99`() {
         viewModel.setBaseCurrencyAmount(BigDecimal.valueOf(999.99))
-        viewModel.updateExchangedCurrencies()
+        viewModel.recalculateCurrenciesPrices()
 
-        viewModel.getEstimatedCurrencyExchange().observeForever { estimatedCurrenciesExchange ->
+        viewModel.getCalculatedCurrencyExchange().observeForever { estimatedCurrenciesExchange ->
             assertEquals(3, estimatedCurrenciesExchange?.size)
 
             assertEquals(Currency.EUR, estimatedCurrenciesExchange?.get(0)?.currency)

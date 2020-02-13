@@ -1,0 +1,20 @@
+apply from: "$rootProject.projectDir/android-library.gradle"
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+
+dependencies {
+    implementation deps.kotlin_std_lib
+    api project(":domain")
+    api project(":core-ports-android")
+
+    compileOnly deps.androidx_lifecycle_livedata
+    compileOnly deps.androidx_lifecycle_extensions
+
+    testImplementation deps.junit
+    testImplementation deps.mockito
+    testImplementation deps.google_truth
+
+    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+}

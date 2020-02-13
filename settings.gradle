@@ -1,1 +1,1 @@
-include ':core', ':domain', ':app'
+include ':core', ':domain', ':app', ':core-ports', ':core-ports-android', ':persistence-sharedprefs'
