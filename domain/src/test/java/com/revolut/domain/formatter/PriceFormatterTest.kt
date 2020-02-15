@@ -60,5 +60,8 @@ class PriceFormatterTest {
 
         assertThat(PriceFormatter.displayPriceUpTo2Decimals(Price.valueOf(1010.5533)))
             .isEqualTo("1010.55")
+
+        assertThat(PriceFormatter.displayPriceUpTo2Decimals(Price.valueOf(0.9999)))
+            .isEqualTo("1")
     }
 }
