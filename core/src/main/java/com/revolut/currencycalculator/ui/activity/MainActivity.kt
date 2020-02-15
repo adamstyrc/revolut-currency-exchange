@@ -46,8 +46,6 @@ class MainActivity : AppCompatActivity() {
         InjectionGraph.Manager.init(this).inject(this)
         viewModel = viewModelFactory.create(CurrencyRateViewModel::class.java)
 
-        rvCurrencyRates.layoutManager = LinearLayoutManager(this)
-
         rvCurrencyRates.adapter = currenciesCalculatorAdapter
         (rvCurrencyRates.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
