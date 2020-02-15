@@ -18,7 +18,7 @@ import com.revolut.domain.model.Currency
 import com.revolut.domain.model.CalculatedCurrencyPrice
 
 class CurrenciesCalculatorAdapter(
-    var items: MutableList<CalculatedCurrencyPrice>
+    private var items: MutableList<CalculatedCurrencyPrice> = arrayListOf()
 ) : RecyclerView.Adapter<CurrenciesCalculatorAdapter.ViewHolder>() {
 
     var onBaseCurrencyChanged: OnBaseCurrencyChanged? = null

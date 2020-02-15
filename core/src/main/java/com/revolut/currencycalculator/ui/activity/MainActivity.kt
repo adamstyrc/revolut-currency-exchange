@@ -25,7 +25,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private lateinit var viewModel: CurrencyRateViewModel
-    private var currenciesCalculatorAdapter = CurrenciesCalculatorAdapter(ArrayList())
     private val onBaseCurrencyChanged =
         object : CurrenciesCalculatorAdapter.OnBaseCurrencyChanged {
             override fun onBaseCurrencyChanged(currency: Currency) {
@@ -36,6 +35,9 @@ class MainActivity : AppCompatActivity() {
                 setBaseCurrencyAmount(amount)
             }
         }
+    private var currenciesCalculatorAdapter = CurrenciesCalculatorAdapter()
+        .apply { onBaseCurrencyChanged = this@MainActivity.onBaseCurrencyChanged }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +49,6 @@ class MainActivity : AppCompatActivity() {
         rvCurrencyRates.layoutManager = LinearLayoutManager(this)
 
         rvCurrencyRates.adapter = currenciesCalculatorAdapter
-        currenciesCalculatorAdapter.onBaseCurrencyChanged = onBaseCurrencyChanged
         (rvCurrencyRates.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
 
         viewModel.getCalculatedCurrencyExchange().observe(this, Observer { currencyRates ->
