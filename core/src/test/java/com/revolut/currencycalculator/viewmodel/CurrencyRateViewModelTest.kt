@@ -1,11 +1,13 @@
 package com.revolut.currencycalculator.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.google.common.truth.Truth.assertThat
+import com.revolut.currencycalculator.InMemoryCurrencyValuationRepository
 import com.revolut.currencycalculator.api.RevolutApi
-import com.revolut.domain.CurrencyValuationTestData
+import com.revolut.domain.Price
+import com.revolut.domain.model.CalculatedCurrencyPrice
 import com.revolut.domain.model.Currency
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.assertTrue
+import com.revolut.testpack.CurrencyValuationTestData
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -19,7 +21,8 @@ class CurrencyRateViewModelTest {
     @JvmField
     val rule: InstantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private var api = mock(RevolutApi::class.java)
+    private val api = mock(RevolutApi::class.java)
+    private val currencyValuationRepository = InMemoryCurrencyValuationRepository()
     private lateinit var viewModel: CurrencyRateViewModel
 
     private val currencyValuationTestData = CurrencyValuationTestData()
@@ -37,32 +40,33 @@ class CurrencyRateViewModelTest {
 //        `when`(api.getLatest(Currency.USD.name))
 //            .thenReturn(Single.just(valuationEUR))
 
-        viewModel = CurrencyRateViewModel(api)
+        viewModel = CurrencyRateViewModel(api, currencyValuationRepository)
         viewModel.setDemandedCurrencies(orderedCurrencies)
     }
 
     @Test
     fun `base currency is set to EUR`() {
+        currencyValuationRepository.saveCurrencyValuation(currencyValuationTestData.ratesForEUR1)
+
         viewModel.getCalculatedCurrencyExchange().observeForever { estimatedCurrenciesExchange ->
-            assertEquals(3, estimatedCurrenciesExchange?.size)
+            assertThat(estimatedCurrenciesExchange?.size)
+                .isEqualTo(3)
 
-            assertEquals(Currency.EUR, estimatedCurrenciesExchange?.get(0)?.currency)
-            assertTrue(
-                BigDecimal.valueOf(100)
-                    .compareTo(estimatedCurrenciesExchange?.get(0)?.value) == 0
-            )
+            assertThat(estimatedCurrenciesExchange?.get(0)?.currency)
+                .isEqualTo(Currency.EUR)
+            assertThat(estimatedCurrenciesExchange?.get(0)?.value)
+                .isEqualToIgnoringScale(BigDecimal.valueOf(100))
 
-            assertEquals(Currency.USD, estimatedCurrenciesExchange?.get(1)?.currency)
-            assertTrue(
-                BigDecimal.valueOf(116.52)
-                    .compareTo(estimatedCurrenciesExchange?.get(1)?.value) == 0
-            )
+            assertThat(estimatedCurrenciesExchange?.get(1)?.currency)
+                .isEqualTo(Currency.USD)
+            assertThat(estimatedCurrenciesExchange?.get(1)?.value)
+                .isEqualToIgnoringScale(BigDecimal.valueOf(116.016))
 
-            assertEquals(Currency.PLN, estimatedCurrenciesExchange?.get(2)?.currency)
-            assertTrue(
-                BigDecimal.valueOf(432.48)
-                    .compareTo(estimatedCurrenciesExchange?.get(2)?.value) == 0
-            )
+            assertThat(estimatedCurrenciesExchange?.get(2)?.currency)
+                .isEqualTo(Currency.PLN)
+            assertThat(estimatedCurrenciesExchange?.get(2)?.value)
+                .isEqualToIgnoringScale(BigDecimal.valueOf(431.834))
+
         }
     }
 
@@ -71,29 +75,25 @@ class CurrencyRateViewModelTest {
         val expectedNewBaseAmount = BigDecimal.valueOf(116.52)
 
         viewModel.setBaseCurrency(Currency.USD)
-        viewModel.setLatestCurrencyValuation(valuationUSD)
-        viewModel.recalculateCurrenciesPrices()
 
         viewModel.getCalculatedCurrencyExchange().observeForever { estimatedCurrenciesExchange ->
-            assertEquals(3, estimatedCurrenciesExchange?.size)
+            assertThat(estimatedCurrenciesExchange?.size)
+                .isEqualTo(3)
 
-            assertEquals(Currency.USD, estimatedCurrenciesExchange?.get(0)?.currency)
-            assertTrue(
-                expectedNewBaseAmount
-                    .compareTo(estimatedCurrenciesExchange?.get(0)?.value) == 0
-            )
+            assertThat(estimatedCurrenciesExchange?.get(0)?.currency)
+                .isEqualTo(Currency.USD)
+            assertThat(estimatedCurrenciesExchange?.get(0)?.value)
+                .isEqualToIgnoringScale(expectedNewBaseAmount)
 
-            assertEquals(Currency.EUR, estimatedCurrenciesExchange?.get(1)?.currency)
-            assertTrue(
-                expectedNewBaseAmount.multiply(BigDecimal.valueOf(0.85646))
-                    .compareTo(estimatedCurrenciesExchange?.get(1)?.value) == 0
-            )
+            assertThat(estimatedCurrenciesExchange?.get(1)?.currency)
+                .isEqualTo(Currency.EUR)
+            assertThat(estimatedCurrenciesExchange?.get(1)?.value)
+                .isEqualToIgnoringScale(expectedNewBaseAmount.multiply(BigDecimal.valueOf(0.85646)))
 
-            assertEquals(Currency.PLN, estimatedCurrenciesExchange?.get(2)?.currency)
-            assertTrue(
-                expectedNewBaseAmount.multiply(BigDecimal.valueOf(3.6984))
-                    .compareTo(estimatedCurrenciesExchange?.get(2)?.value) == 0
-            )
+            assertThat(estimatedCurrenciesExchange?.get(2)?.currency)
+                .isEqualTo(Currency.PLN)
+            assertThat(estimatedCurrenciesExchange?.get(2)?.value)
+                .isEqualToIgnoringScale(expectedNewBaseAmount.multiply(BigDecimal.valueOf(3.6984)))
         }
     }
 
@@ -102,84 +102,88 @@ class CurrencyRateViewModelTest {
         val expectedNewBaseAmount = BigDecimal.valueOf(432.48)
 
         viewModel.setBaseCurrency(Currency.PLN)
-        viewModel.recalculateCurrenciesPrices()
 
         viewModel.getCalculatedCurrencyExchange().observeForever { estimatedCurrenciesExchange ->
-            assertEquals(3, estimatedCurrenciesExchange?.size)
+            assertThat(estimatedCurrenciesExchange?.size)
+                .isEqualTo(3)
 
-            assertEquals(Currency.PLN, estimatedCurrenciesExchange?.get(0)?.currency)
-            assertTrue(
-                expectedNewBaseAmount
-                    .compareTo(estimatedCurrenciesExchange?.get(0)?.value) == 0
-            )
+            assertThat(estimatedCurrenciesExchange?.get(0)?.currency)
+                .isEqualTo(Currency.PLN)
+            assertThat(estimatedCurrenciesExchange?.get(0)?.value)
+                .isEqualToIgnoringScale(expectedNewBaseAmount)
 
-            assertEquals(Currency.EUR, estimatedCurrenciesExchange?.get(1)?.currency)
-            assertTrue(
-                BigDecimal.valueOf(100)
-                    .compareTo(estimatedCurrenciesExchange?.get(1)?.value) == 0
-            )
+            assertThat(estimatedCurrenciesExchange?.get(1)?.currency)
+                .isEqualTo(Currency.EUR)
+            assertThat(estimatedCurrenciesExchange?.get(1)?.value)
+                .isEqualToIgnoringScale(BigDecimal.valueOf(100))
 
-            assertEquals(Currency.USD, estimatedCurrenciesExchange?.get(2)?.currency)
-            assertTrue(
-                BigDecimal.valueOf(116.52)
-                    .compareTo(estimatedCurrenciesExchange?.get(2)?.value) == 0
-            )
+            assertThat(estimatedCurrenciesExchange?.get(2)?.currency)
+                .isEqualTo(Currency.USD)
+            assertThat(estimatedCurrenciesExchange?.get(2)?.value)
+                .isEqualToIgnoringScale(BigDecimal.valueOf(116.52))
         }
     }
 
     @Test
     fun `set amount to 0`() {
         viewModel.setBaseCurrencyAmount(BigDecimal.ZERO)
-        viewModel.recalculateCurrenciesPrices()
 
         viewModel.getCalculatedCurrencyExchange().observeForever { estimatedCurrenciesExchange ->
-            assertEquals(3, estimatedCurrenciesExchange?.size)
+            assertThat(estimatedCurrenciesExchange?.size)
+                .isEqualTo(3)
 
-            assertEquals(Currency.EUR, estimatedCurrenciesExchange?.get(0)?.currency)
-            assertTrue(
-                BigDecimal.ZERO
-                    .compareTo(estimatedCurrenciesExchange?.get(1)?.value) == 0
-            )
+            assertThat(estimatedCurrenciesExchange?.get(0)?.currency)
+                .isEqualTo(Currency.EUR)
+            assertThat(estimatedCurrenciesExchange?.get(0)?.value)
+                .isEqualToIgnoringScale(BigDecimal.ZERO)
 
-            assertEquals(Currency.USD, estimatedCurrenciesExchange?.get(1)?.currency)
-            assertTrue(
-                BigDecimal.ZERO
-                    .compareTo(estimatedCurrenciesExchange?.get(1)?.value) == 0
-            )
 
-            assertEquals(Currency.PLN, estimatedCurrenciesExchange?.get(2)?.currency)
-            assertTrue(
-                BigDecimal.ZERO
-                    .compareTo(estimatedCurrenciesExchange?.get(2)?.value) == 0
-            )
+            checkCurrencyExchangeIsEqualTo(
+                estimatedCurrenciesExchange?.get(1),
+                Currency.USD,
+                BigDecimal.ZERO)
+
+            checkCurrencyExchangeIsEqualTo(
+                estimatedCurrenciesExchange?.get(2),
+                Currency.PLN,
+                BigDecimal.ZERO)
         }
     }
 
     @Test
     fun `set amount to 999,99`() {
         viewModel.setBaseCurrencyAmount(BigDecimal.valueOf(999.99))
-        viewModel.recalculateCurrenciesPrices()
 
         viewModel.getCalculatedCurrencyExchange().observeForever { estimatedCurrenciesExchange ->
-            assertEquals(3, estimatedCurrenciesExchange?.size)
+            assertThat(estimatedCurrenciesExchange?.size)
+                .isEqualTo(3)
 
-            assertEquals(Currency.EUR, estimatedCurrenciesExchange?.get(0)?.currency)
-            assertTrue(
-                BigDecimal.valueOf(999.99)
-                    .compareTo(estimatedCurrenciesExchange?.get(0)?.value) == 0
-            )
+            checkCurrencyExchangeIsEqualTo(
+                estimatedCurrenciesExchange?.get(0),
+                Currency.EUR,
+                BigDecimal.valueOf(999.99))
 
-            assertEquals(Currency.USD, estimatedCurrenciesExchange?.get(1)?.currency)
-            assertTrue(
-                BigDecimal.valueOf(1165.188348)
-                    .compareTo(estimatedCurrenciesExchange?.get(1)?.value) == 0
-            )
 
-            assertEquals(Currency.PLN, estimatedCurrenciesExchange?.get(2)?.currency)
-            assertTrue(
-                BigDecimal.valueOf(4324.756752)
-                    .compareTo(estimatedCurrenciesExchange?.get(2)?.value) == 0
-            )
+            checkCurrencyExchangeIsEqualTo(
+                estimatedCurrenciesExchange?.get(1),
+                Currency.USD,
+                BigDecimal.valueOf(1165.188348))
+
+            checkCurrencyExchangeIsEqualTo(
+                estimatedCurrenciesExchange?.get(2),
+                Currency.PLN,
+                BigDecimal.valueOf(4324.756752))
         }
+    }
+
+    private fun checkCurrencyExchangeIsEqualTo(
+        calculatedCurrencyPrice: CalculatedCurrencyPrice?,
+        expectedCurrency: Currency,
+        expectedPrice: Price
+    ) {
+        assertThat(calculatedCurrencyPrice?.currency)
+            .isEqualTo(expectedCurrency)
+        assertThat(calculatedCurrencyPrice?.value)
+            .isEqualToIgnoringScale(expectedPrice)
     }
 }

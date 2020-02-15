@@ -2,11 +2,12 @@ apply plugin: 'java-library'
 apply plugin: 'kotlin'
 
 dependencies {
+    implementation project(":domain")
     implementation deps.kotlin_std_lib
 
-    testImplementation project(":testpack")
-//    testImplementation deps.mockito
-//    testImplementation deps.google_truth
+    api deps.junit
+    api deps.mockito
+    api deps.google_truth
 }
 
 sourceCompatibility = "7"

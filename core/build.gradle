@@ -51,11 +51,11 @@ dependencies {
         exclude group: 'rx.exceptions', module: 'rxjava2'
     }
     implementation deps.okhttp3_logging_interceptor
-    implementation 'com.readystatesoftware.chuck:library:1.1.0'
+    implementation deps.chuck
 
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.mockito:mockito-core:2.19.0'
+    testImplementation project(":testpack")
     testImplementation 'android.arch.core:core-testing:1.1.1'
+
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }

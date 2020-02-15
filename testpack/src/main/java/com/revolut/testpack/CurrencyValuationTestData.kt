@@ -1,17 +1,18 @@
-package com.revolut.domain
+package com.revolut.testpack
 
 import com.revolut.domain.model.Currency
 import com.revolut.domain.model.CurrencyValuation
 import java.math.BigDecimal
+import java.util.Collections.emptyMap
 
 class CurrencyValuationTestData {
 
-    val ratesFromUSDempty= CurrencyValuation(
+    val ratesForUSDempty= CurrencyValuation(
         base = Currency.USD,
         rates = emptyMap()
     )
 
-    val ratesFromUSD1 = CurrencyValuation(
+    val ratesForUSD1 = CurrencyValuation(
         base = Currency.USD,
         rates = hashMapOf(
             Currency.EUR to BigDecimal.valueOf(0.86195),
@@ -21,7 +22,7 @@ class CurrencyValuationTestData {
         )
     )
 
-    val ratesFromEUR1 = CurrencyValuation(
+    val ratesForEUR1 = CurrencyValuation(
         base = Currency.EUR,
         rates = hashMapOf(
             Currency.USD to BigDecimal.valueOf(1.16016),
@@ -30,7 +31,7 @@ class CurrencyValuationTestData {
         )
     )
 
-    val ratesFromEUR2 = CurrencyValuation(
+    val ratesForEUR2 = CurrencyValuation(
         base = Currency.EUR,
         rates = hashMapOf(
             Currency.USD to BigDecimal.valueOf(1.16016),

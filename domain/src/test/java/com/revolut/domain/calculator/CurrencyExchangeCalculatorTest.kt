@@ -1,8 +1,8 @@
 package com.revolut.domain.calculator
 
 import com.google.common.truth.Truth.assertThat
-import com.revolut.domain.CurrencyValuationTestData
 import com.revolut.domain.model.Currency
+import com.revolut.testpack.CurrencyValuationTestData
 import org.junit.Test
 import java.math.BigDecimal
 
@@ -18,7 +18,7 @@ class CurrencyExchangeCalculatorTest {
             Currency.USD,
             BigDecimal.valueOf(100),
             Currency.EUR,
-            currencyValuationTestData.ratesFromUSDempty
+            currencyValuationTestData.ratesForUSDempty
         )
 
         assertThat(calculatedCurrencyPrice)
@@ -31,7 +31,7 @@ class CurrencyExchangeCalculatorTest {
             Currency.USD,
             BigDecimal.valueOf(1),
             Currency.PLN,
-            currencyValuationTestData.ratesFromUSD1
+            currencyValuationTestData.ratesForUSD1
         )
 
         assertThat(calculatedCurrencyPrice)
@@ -44,7 +44,7 @@ class CurrencyExchangeCalculatorTest {
             Currency.USD,
             BigDecimal.valueOf(100),
             Currency.GBP,
-            currencyValuationTestData.ratesFromUSD1
+            currencyValuationTestData.ratesForUSD1
         )
 
         assertThat(calculatedCurrencyPrice)
@@ -57,7 +57,7 @@ class CurrencyExchangeCalculatorTest {
             Currency.EUR,
             BigDecimal.valueOf(500),
             Currency.AUD,
-            currencyValuationTestData.ratesFromEUR2
+            currencyValuationTestData.ratesForEUR2
         )
 
         assertThat(calculatedCurrencyPrice)
@@ -70,7 +70,7 @@ class CurrencyExchangeCalculatorTest {
             Currency.EUR,
             BigDecimal.valueOf(1000.24),
             Currency.AUD,
-            currencyValuationTestData.ratesFromEUR2
+            currencyValuationTestData.ratesForEUR2
         )
 
         assertThat(calculatedCurrencyPrice)
@@ -83,7 +83,7 @@ class CurrencyExchangeCalculatorTest {
             Currency.EUR,
             BigDecimal.valueOf(0),
             Currency.AUD,
-            currencyValuationTestData.ratesFromEUR2
+            currencyValuationTestData.ratesForEUR2
         )
 
         assertThat(calculatedCurrencyPrice)

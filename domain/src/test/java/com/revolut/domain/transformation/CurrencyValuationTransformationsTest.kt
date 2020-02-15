@@ -1,8 +1,8 @@
 package com.revolut.domain.transformation
 
 import com.google.common.truth.Truth.assertThat
-import com.revolut.domain.CurrencyValuationTestData
 import com.revolut.domain.model.Currency
+import com.revolut.testpack.CurrencyValuationTestData
 import org.junit.Test
 import java.math.BigDecimal
 
@@ -14,7 +14,7 @@ class CurrencyValuationTransformationsTest {
     fun fromUSDtoEUR_baseProperlySet() {
         val currencyValuationForAnotherCurrency =
             CurrencyValuationTransformations.transformCurrencyValuationForNewCurrency(
-                currencyValuationTestData.ratesFromUSD1,
+                currencyValuationTestData.ratesForUSD1,
                 Currency.EUR
             )
 
@@ -26,7 +26,7 @@ class CurrencyValuationTransformationsTest {
     fun fromUSDtoEUR_ratesCorrect() {
         val currencyValuationForAnotherCurrency =
             CurrencyValuationTransformations.transformCurrencyValuationForNewCurrency(
-                currencyValuationTestData.ratesFromUSD1,
+                currencyValuationTestData.ratesForUSD1,
                 Currency.EUR
             )
 
@@ -42,7 +42,7 @@ class CurrencyValuationTransformationsTest {
     fun fromEURtoUSD_ratesCorrect() {
         val currencyValuationForAnotherCurrency =
             CurrencyValuationTransformations.transformCurrencyValuationForNewCurrency(
-                currencyValuationTestData.ratesFromEUR1,
+                currencyValuationTestData.ratesForEUR1,
                 Currency.USD
             )
 
