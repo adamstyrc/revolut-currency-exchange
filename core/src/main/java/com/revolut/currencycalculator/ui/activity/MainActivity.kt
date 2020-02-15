@@ -45,6 +45,9 @@ class MainActivity : AppCompatActivity() {
 
         InjectionGraph.Manager.init(this).inject(this)
         viewModel = viewModelFactory.create(CurrencyRateViewModel::class.java)
+        if (savedInstanceState != null) {
+            viewModel.restoreState(savedInstanceState)
+        }
 
         rvCurrencyRates.adapter = currenciesCalculatorAdapter
         (rvCurrencyRates.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
@@ -63,6 +66,11 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         viewModel.cancelUpdatingCurrencyRates()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        viewModel.saveState(outState)
     }
 
     fun setBaseCurrencyAmount(amount: Price) {

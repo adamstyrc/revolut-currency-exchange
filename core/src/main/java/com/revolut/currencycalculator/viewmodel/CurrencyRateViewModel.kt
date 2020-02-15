@@ -1,9 +1,11 @@
 package com.revolut.currencycalculator.viewmodel
 
+import android.os.Bundle
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.revolut.currencycalculator.api.RevolutApi
+import com.revolut.currencycalculator.utils.Logger
 import com.revolut.domain.Price
 import com.revolut.domain.calculator.CurrencyExchangeCalculator
 import com.revolut.domain.model.Currency
@@ -25,10 +27,11 @@ class CurrencyRateViewModel @Inject constructor(
 
     companion object {
         const val AUTO_REFRESH_PERIOD_IN_SECONDS = 1L
+        const val DEFAULT_BASE_CURRENCY_AMOUNT = 100.0
     }
 
     private var demandedCurrencies: MutableList<Currency> = ArrayList(Currency.values().toList())
-    private var baseCurrencyAmount = BigDecimal(100.00)
+    private var baseCurrencyAmount = BigDecimal(DEFAULT_BASE_CURRENCY_AMOUNT)
     private var currencyExchangeCalculator = CurrencyExchangeCalculator()
 
     private val currencyValuationLiveData =
@@ -41,19 +44,15 @@ class CurrencyRateViewModel @Inject constructor(
     private val calculatedCurrenciesPricesList = MutableLiveData<List<CalculatedCurrencyPrice>>()
     private var disposable = Disposables.disposed()
 
-
     init {
         currencyValuationLiveData.observeForever(currencyValuationObserver)
     }
-
 
     override fun onCleared() {
         super.onCleared()
 
         disposable.dispose()
-
-        currencyValuationLiveData
-            .removeObserver(currencyValuationObserver)
+        currencyValuationLiveData.removeObserver(currencyValuationObserver)
     }
 
 
@@ -108,6 +107,36 @@ class CurrencyRateViewModel @Inject constructor(
     fun getCalculatedCurrencyExchange() =
         calculatedCurrenciesPricesList
 
+    fun saveState(outState: Bundle) {
+        outState.putStringArray(
+            SavedItems.DEMANDED_CURRENCIES.name,
+            demandedCurrencies.map { it.name }.toTypedArray()
+        )
+
+        outState.putDouble(SavedItems.BASE_CURRENCY_AMOUNT.name, baseCurrencyAmount.toDouble())
+    }
+
+    fun restoreState(savedState: Bundle) {
+        Logger.log("CurrencyRateView: restoreState($savedState)")
+
+        savedState.getStringArray(SavedItems.DEMANDED_CURRENCIES.name)
+            ?.let { restoredDemandedCurrencies ->
+                this.demandedCurrencies = restoredDemandedCurrencies.toList()
+                    .map { Currency.valueOf(it) }
+                    .toMutableList()
+            }
+
+        savedState.getDouble(SavedItems.BASE_CURRENCY_AMOUNT.name, DEFAULT_BASE_CURRENCY_AMOUNT)
+            .let { restoredBaseCurrencyAmount ->
+                this.baseCurrencyAmount = Price.valueOf(restoredBaseCurrencyAmount)
+            }
+
+        currencyValuationLiveData.value?.let { currencyValuation ->
+            recalculateCurrenciesPrices(currencyValuation)
+        }
+
+    }
+
     private fun recalculateCurrenciesPrices(currencyValuation: CurrencyValuation) {
         val recalculatedCurrenciesPrices = calculateCurrenciesPrices(
             getBaseCurrency(),
@@ -150,7 +179,13 @@ class CurrencyRateViewModel @Inject constructor(
 
             CalculatedCurrencyPrice(
                 currency = currency,
-                value = calculatedPrice ?: Price.valueOf(0))
+                value = calculatedPrice ?: Price.valueOf(0)
+            )
         }
+    }
+
+    enum class SavedItems {
+        DEMANDED_CURRENCIES,
+        BASE_CURRENCY_AMOUNT;
     }
 }
