@@ -6,7 +6,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.revolut.currencycalculator.R
-import com.revolut.currencycalculator.dagger.InjectionGraph
+import com.revolut.currencycalculator.dagger.RevolutComponent
 import com.revolut.currencycalculator.ui.adapter.CurrenciesCalculatorAdapter
 import com.revolut.currencycalculator.logging.Logger
 import com.revolut.currencycalculator.viewmodel.CurrencyRateViewModel
@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        InjectionGraph.Manager.init(this).inject(this)
+        RevolutComponent.Manager.init(this).inject(this)
         viewModel = viewModelFactory.create(CurrencyRateViewModel::class.java)
         if (savedInstanceState != null) {
             viewModel.restoreState(savedInstanceState)
