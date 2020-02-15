@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.revolut.currencycalculator.api.RevolutApi
-import com.revolut.currencycalculator.utils.Logger
+import com.revolut.currencycalculator.logging.Logger
 import com.revolut.domain.Price
 import com.revolut.domain.calculator.CurrencyExchangeCalculator
 import com.revolut.domain.model.Currency

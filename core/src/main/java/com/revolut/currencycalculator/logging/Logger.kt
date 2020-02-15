@@ -1,4 +1,4 @@
-package com.revolut.currencycalculator.utils
+package com.revolut.currencycalculator.logging
 
 import android.util.Log
 import com.revolut.currencycalculator.BuildConfig

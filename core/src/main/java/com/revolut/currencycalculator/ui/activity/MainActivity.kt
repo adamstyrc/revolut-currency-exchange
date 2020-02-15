@@ -4,13 +4,11 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.revolut.currencycalculator.R
 import com.revolut.currencycalculator.dagger.InjectionGraph
 import com.revolut.currencycalculator.ui.adapter.CurrenciesCalculatorAdapter
-import com.revolut.currencycalculator.utils.Logger
+import com.revolut.currencycalculator.logging.Logger
 import com.revolut.currencycalculator.viewmodel.CurrencyRateViewModel
 import com.revolut.domain.Price
 import com.revolut.domain.model.Currency

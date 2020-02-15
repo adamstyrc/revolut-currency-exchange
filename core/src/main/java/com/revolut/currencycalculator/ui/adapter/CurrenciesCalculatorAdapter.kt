@@ -11,7 +11,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.revolut.currencycalculator.R
 import com.revolut.currencycalculator.model.CurrenciesInfo
-import com.revolut.currencycalculator.utils.Logger
+import com.revolut.currencycalculator.logging.Logger
 import com.revolut.domain.Price
 import com.revolut.domain.formatter.PriceFormatter
 import com.revolut.domain.model.Currency
