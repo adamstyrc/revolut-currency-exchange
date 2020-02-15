@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
+
     private lateinit var viewModel: CurrencyRateViewModel
     private var currenciesCalculatorAdapter = CurrenciesCalculatorAdapter(ArrayList())
     private val onBaseCurrencyChanged =
@@ -41,8 +42,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         InjectionGraph.Manager.init(this).inject(this)
-        viewModel = ViewModelProviders.of(this, viewModelFactory)
-            .get(CurrencyRateViewModel::class.java)
+        viewModel = viewModelFactory.create(CurrencyRateViewModel::class.java)
 
         rvCurrencyRates.layoutManager = LinearLayoutManager(this)
 
