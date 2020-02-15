@@ -33,7 +33,6 @@ class CurrencyRateViewModel @Inject constructor(
     private var demandedCurrencies: MutableList<Currency> = ArrayList(Currency.values().toList())
     private var baseCurrencyAmount = BigDecimal(DEFAULT_BASE_CURRENCY_AMOUNT)
     private var currencyExchangeCalculator = CurrencyExchangeCalculator()
-
     private val currencyValuationLiveData =
         localCurrencyValuationRepository.getCurrencyValuation()
     private val currencyValuationObserver = Observer<CurrencyValuation?> { currencyValuation ->
@@ -63,17 +62,15 @@ class CurrencyRateViewModel @Inject constructor(
     fun startUpdatingCurrencyRates() {
         // TODO consider rewriting so the first request is fired instantly and others every second
         disposable = Observable.interval(AUTO_REFRESH_PERIOD_IN_SECONDS, TimeUnit.SECONDS)
-            .flatMap {
+            .flatMapMaybe {
                 api.getLatest(getBaseCurrency().name)
                     .filter { it.isValid() }
                     .map { it.toDomainModel() }
-                    .toObservable()
             }
             .retry()
             .subscribeBy(
                 onNext = { currencyRateData ->
                     localCurrencyValuationRepository.saveCurrencyValuation(currencyRateData)
-//                    recalculateCurrenciesPrices()
                 },
                 onError = {
                     it.printStackTrace()
